@@ -1,0 +1,309 @@
+.page-trainings {
+  gap: 14px;
+}
+
+.training-mode-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  padding: 4px;
+  border-radius: 14px;
+  border: 1px solid rgba(58, 58, 58, 0.92);
+  background: linear-gradient(180deg, rgba(20, 20, 20, 0.98), rgba(16, 16, 16, 0.96));
+}
+
+.training-mode-tab {
+  min-height: 42px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #a79e93;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.training-mode-tab.is-active {
+  background: linear-gradient(180deg, #d6c6bb, #c8bba0);
+  color: #151515;
+  border-color: #e1d4c8;
+}
+
+.featured-training {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid rgba(107, 91, 68, 0.45);
+  padding: 18px;
+  background: linear-gradient(142deg, rgba(36, 30, 24, 0.95), rgba(18, 18, 18, 0.94) 68%);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.featured-training::before {
+  content: '';
+  position: absolute;
+  inset: -4px -34% -42% 44%;
+  background:
+    radial-gradient(circle at 60% 28%, rgba(234, 227, 219, 0.24), rgba(234, 227, 219, 0) 62%),
+    radial-gradient(circle at 42% 78%, rgba(214, 198, 187, 0.18), rgba(214, 198, 187, 0) 68%);
+  pointer-events: none;
+}
+
+.featured-training::after {
+  content: '';
+  position: absolute;
+  left: -34px;
+  right: -14px;
+  bottom: -56px;
+  height: 146px;
+  border-radius: 999px;
+  border: 1px solid rgba(234, 227, 219, 0.11);
+  pointer-events: none;
+}
+
+.featured-training__content {
+  position: relative;
+  z-index: 1;
+}
+
+.featured-training h2 {
+  margin: 0;
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-size: 34px;
+  line-height: 0.98;
+  max-width: 72%;
+}
+
+.featured-training p {
+  margin-top: 8px;
+  max-width: 70%;
+  color: rgba(234, 227, 219, 0.84);
+  font-size: 15px;
+  line-height: 1.24;
+}
+
+.featured-training__meta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 8px;
+}
+
+.meta-pill {
+  min-height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(214, 198, 187, 0.24);
+  background: rgba(14, 14, 14, 0.5);
+  color: #ece5db;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 14px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.meta-pill svg {
+  width: 15px;
+  height: 15px;
+}
+
+.training-categories {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.training-category {
+  min-height: 70px;
+  border-radius: 16px;
+  border: 1px solid rgba(58, 58, 58, 0.88);
+  background: #1a1a1a;
+  color: #e7ddd1;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.08;
+  text-align: left;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.training-category::after {
+  content: '';
+  position: absolute;
+  top: -18px;
+  right: -18px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: rgba(214, 198, 187, 0.16);
+}
+
+.training-category span {
+  position: relative;
+  z-index: 1;
+}
+
+.training-category.tone-sky {
+  background: linear-gradient(138deg, rgba(42, 42, 42, 0.96), rgba(28, 28, 28, 0.96));
+  border-color: rgba(214, 198, 187, 0.2);
+}
+
+.training-category.tone-rose-soft {
+  background: linear-gradient(138deg, rgba(48, 42, 36, 0.96), rgba(30, 28, 26, 0.96));
+  border-color: rgba(214, 198, 187, 0.26);
+}
+
+.training-category.tone-violet {
+  background: linear-gradient(138deg, rgba(43, 40, 37, 0.96), rgba(24, 24, 24, 0.96));
+  border-color: rgba(200, 187, 160, 0.23);
+}
+
+.training-category.tone-mint {
+  background: linear-gradient(138deg, rgba(47, 41, 34, 0.96), rgba(25, 24, 22, 0.96));
+  border-color: rgba(200, 187, 160, 0.28);
+}
+
+.training-program-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.training-program-card {
+  width: 100%;
+  border-radius: 24px;
+  border: 1px solid rgba(214, 198, 187, 0.17);
+  padding: 16px;
+  min-height: 180px;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  color: #151515;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.training-program-card::before {
+  content: '';
+  position: absolute;
+  inset: auto -48px -88px 44%;
+  height: 168px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  pointer-events: none;
+}
+
+.training-program-card::after {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: -10px;
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.33), rgba(255, 255, 255, 0) 72%);
+  pointer-events: none;
+}
+
+.training-program-card__label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(21, 21, 21, 0.68);
+  font-weight: 700;
+}
+
+.training-program-card h3 {
+  text-transform: none;
+  margin: 0;
+  letter-spacing: 0.01em;
+  font-size: 32px;
+  line-height: 0.98;
+  max-width: 80%;
+}
+
+.training-program-card p {
+  color: rgba(21, 21, 21, 0.72);
+  max-width: 74%;
+  font-size: 15px;
+}
+
+.training-program-card__meta {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.training-program-card strong {
+  font-size: 38px;
+  line-height: 1;
+}
+
+.training-program-card__meta span {
+  min-height: 30px;
+  border-radius: 999px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(21, 21, 21, 0.78);
+  border: 1px solid rgba(21, 21, 21, 0.18);
+  background: rgba(255, 255, 255, 0.37);
+}
+
+.training-program-card__arrow {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(21, 21, 21, 0.22);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.46);
+  z-index: 2;
+}
+
+.training-program-card__arrow svg {
+  width: 14px;
+  height: 14px;
+}
+
+.featured-training.tone-rose {
+  border-color: rgba(200, 187, 160, 0.48);
+  background: linear-gradient(142deg, rgba(56, 44, 34, 0.95), rgba(24, 22, 20, 0.96) 72%);
+}
+
+.featured-training.tone-sand {
+  border-color: rgba(200, 187, 160, 0.44);
+  background: linear-gradient(142deg, rgba(50, 44, 37, 0.96), rgba(20, 20, 20, 0.96) 68%);
+}
+
+.training-program-card.tone-blue-card {
+  background: linear-gradient(146deg, #d6c6bb, #c8bba0);
+}
+
+.training-program-card.tone-green-card {
+  background: linear-gradient(146deg, #cdc0a7, #b9aa8d);
+}
+
+.training-program-card.tone-charcoal-card {
+  background: linear-gradient(146deg, #cab9a5, #aa967a);
+}

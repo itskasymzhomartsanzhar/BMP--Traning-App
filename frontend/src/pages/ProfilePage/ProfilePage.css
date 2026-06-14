@@ -1,0 +1,104 @@
+.profile-main,
+.profile-list,
+.subscription-card,
+.calculator-card,
+.settings-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-main p {
+  color: var(--text-muted);
+}
+
+.profile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.profile-tags span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.profile-row,
+.toggle-row {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0 12px;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profile-row strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.subscription-line {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-muted);
+}
+
+.subscription-line strong {
+  color: var(--text-main);
+}
+
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.calc-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.calc-grid input,
+.calc-grid select {
+  width: 100%;
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  padding: 0 10px;
+}
+
+.calc-result {
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.toggle {
+  min-width: 48px;
+  min-height: 26px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.toggle.is-on {
+  color: #1d1d1d;
+  background: var(--success);
+  border-color: var(--success);
+}

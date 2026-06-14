@@ -1,0 +1,83 @@
+.nutrition-overview,
+.nutrition-meals,
+.nutrition-recipes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nutrition-overview__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.macro-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.macro-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  text-align: left;
+  padding: 10px;
+}
+
+.macro-card span {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.macro-card strong {
+  display: block;
+  margin-top: 4px;
+}
+
+.meal-list,
+.recipe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meal-row,
+.recipe-row {
+  width: 100%;
+  min-height: 56px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  padding: 10px 12px;
+}
+
+.meal-row strong,
+.recipe-row strong {
+  display: block;
+  font-size: 15px;
+}
+
+.meal-row__right {
+  text-align: right;
+}
+
+.meal-row__right span,
+.recipe-row span {
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.meal-row__right small {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-muted);
+}
