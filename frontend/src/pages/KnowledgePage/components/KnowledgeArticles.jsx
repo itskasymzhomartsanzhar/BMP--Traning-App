@@ -1,4 +1,4 @@
-function KnowledgeArticles({ articles, onAction }) {
+function KnowledgeArticles({ articles, onArticleClick }) {
   return (
     <div className="knowledge-articles card animate-in delay-2">
       <h2>Статьи</h2>
@@ -9,7 +9,7 @@ function KnowledgeArticles({ articles, onAction }) {
             key={article.id}
             type="button"
             className="article-row"
-            onClick={() => onAction(`Открыта статья: ${article.title}`)}
+            onClick={() => onArticleClick?.(article)}
           >
             <div>
               <strong>{article.title}</strong>

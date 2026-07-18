@@ -1,0 +1,855 @@
+[
+{
+  "model": "workouts.exercisetemplate",
+  "pk": 1,
+  "fields": {
+    "slug": "squat",
+    "name": "Приседания со штангой",
+    "description": "Держите спину ровно, колени направлены по линии носков. Опускайтесь до параллели бедра с полом.",
+    "muscle": "Ноги · Ягодицы",
+    "video_url": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+  }
+},
+{
+  "model": "workouts.exercisetemplate",
+  "pk": 2,
+  "fields": {
+    "slug": "deadlift",
+    "name": "Становая тяга",
+    "description": "Корпус стабилен, штанга движется близко к телу. В верхней точке — полное разгибание.",
+    "muscle": "Спина · Задняя поверхность",
+    "video_url": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+  }
+},
+{
+  "model": "workouts.exercisetemplate",
+  "pk": 3,
+  "fields": {
+    "slug": "bench",
+    "name": "Жим лёжа",
+    "description": "Лопатки сведены, локти под углом 45°. Контролируйте опускание и мощный подъём.",
+    "muscle": "Грудь · Трицепс",
+    "video_url": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+  }
+},
+{
+  "model": "workouts.exercisetemplate",
+  "pk": 4,
+  "fields": {
+    "slug": "row",
+    "name": "Тяга в наклоне",
+    "description": "Корпус параллелен полу, тяните локтями назад. Сводите лопатки в верхней точке.",
+    "muscle": "Спина · Бицепс",
+    "video_url": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+  }
+},
+{
+  "model": "workouts.exercisetemplate",
+  "pk": 5,
+  "fields": {
+    "slug": "pullup",
+    "name": "Подтягивания",
+    "description": "Полная амплитуда: подбородок над перекладиной, контролируемое опускание.",
+    "muscle": "Спина · Бицепс",
+    "video_url": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+  }
+},
+{
+  "model": "workouts.exercisetemplate",
+  "pk": 6,
+  "fields": {
+    "slug": "plank",
+    "name": "Планка",
+    "description": "Тело — прямая линия от головы до пят. Напрягите пресс и ягодицы.",
+    "muscle": "Кор · Стабилизация",
+    "video_url": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+  }
+},
+{
+  "model": "workouts.exercisetemplate",
+  "pk": 7,
+  "fields": {
+    "slug": "burpee",
+    "name": "Бёрпи",
+    "description": "Прыжок, отжимание, прыжок. Держите темп и дыхание ровным.",
+    "muscle": "Full body · Кардио",
+    "video_url": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+  }
+},
+{
+  "model": "workouts.exercisetemplate",
+  "pk": 8,
+  "fields": {
+    "slug": "lunge",
+    "name": "Выпады с гантелями",
+    "description": "Шаг вперёд, колено задней ноги почти касается пола. Корпус вертикально.",
+    "muscle": "Ноги · Ягодицы",
+    "video_url": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+  }
+},
+{
+  "model": "workouts.exercisetemplate",
+  "pk": 9,
+  "fields": {
+    "slug": "pushup",
+    "name": "Отжимания",
+    "description": "Корпус жёсткий, локти под углом 45°. Грудь почти касается пола.",
+    "muscle": "Грудь · Трицепс",
+    "video_url": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+  }
+},
+{
+  "model": "workouts.exercisetemplate",
+  "pk": 10,
+  "fields": {
+    "slug": "jump",
+    "name": "Прыжки на скакалке",
+    "description": "Лёгкие приземления на носки. Руки у корпуса, темп стабильный.",
+    "muscle": "Кардио · Выносливость",
+    "video_url": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+  }
+},
+{
+  "model": "workouts.workoutprogram",
+  "pk": "gym-fat-burn-power",
+  "fields": {
+    "title": "Fat Burn Power",
+    "description": "Силовой микс для жиросжигания, рельефа и выносливости. Интервальные блоки с базовыми движениями.",
+    "duration_minutes": 35,
+    "calories": 350,
+    "intensity": "high",
+    "mode": "gym",
+    "tone": "tone-rose",
+    "tag": "Зал · Интенсив",
+    "is_featured": true,
+    "category": "",
+    "is_active": true
+  }
+},
+{
+  "model": "workouts.workoutprogram",
+  "pk": "gym-fullbody",
+  "fields": {
+    "title": "Full Body Burn",
+    "description": "Высокоинтенсивная тренировка на все тело. Идеальна для жиросжигания и тонуса.",
+    "duration_minutes": 25,
+    "calories": 280,
+    "intensity": "medium",
+    "mode": "gym",
+    "tone": "tone-blue-card",
+    "tag": "Зал · Средний",
+    "is_featured": false,
+    "category": "",
+    "is_active": true
+  }
+},
+{
+  "model": "workouts.workoutprogram",
+  "pk": "gym-hiit",
+  "fields": {
+    "title": "HIIT Condition",
+    "description": "Интервальные блоки для выносливости. Короткий отдых, высокий пульс.",
+    "duration_minutes": 30,
+    "calories": 380,
+    "intensity": "intense",
+    "mode": "gym",
+    "tone": "tone-charcoal-card",
+    "tag": "Зал · Быстрый темп",
+    "is_featured": false,
+    "category": "",
+    "is_active": true
+  }
+},
+{
+  "model": "workouts.workoutprogram",
+  "pk": "gym-power",
+  "fields": {
+    "title": "Power Lift Routine",
+    "description": "Фокус на базовых движениях и силе. Тяжёлые подходы с полным восстановлением.",
+    "duration_minutes": 40,
+    "calories": 320,
+    "intensity": "power",
+    "mode": "gym",
+    "tone": "tone-green-card",
+    "tag": "Зал · Продвинутый",
+    "is_featured": false,
+    "category": "",
+    "is_active": true
+  }
+},
+{
+  "model": "workouts.workoutprogram",
+  "pk": "home-cardio",
+  "fields": {
+    "title": "Cardio Blast",
+    "description": "Пульсовая тренировка в домашних условиях. Без оборудования.",
+    "duration_minutes": 22,
+    "calories": 240,
+    "intensity": "high",
+    "mode": "home",
+    "tone": "tone-charcoal-card",
+    "tag": "Дома · Энергия",
+    "is_featured": false,
+    "category": "",
+    "is_active": true
+  }
+},
+{
+  "model": "workouts.workoutprogram",
+  "pk": "home-core",
+  "fields": {
+    "title": "Core & Balance",
+    "description": "Пресс, стабилизация и осанка. Укрепление центра тела.",
+    "duration_minutes": 24,
+    "calories": 180,
+    "intensity": "tone",
+    "mode": "home",
+    "tone": "tone-green-card",
+    "tag": "Дома · Средний",
+    "is_featured": false,
+    "category": "",
+    "is_active": true
+  }
+},
+{
+  "model": "workouts.workoutprogram",
+  "pk": "home-energy-flow",
+  "fields": {
+    "title": "Home Energy Flow",
+    "description": "Комплекс без оборудования для рельефа и тонуса. Подходит для утренней активации.",
+    "duration_minutes": 28,
+    "calories": 260,
+    "intensity": "medium",
+    "mode": "home",
+    "tone": "tone-sand",
+    "tag": "Дома · Средний",
+    "is_featured": true,
+    "category": "",
+    "is_active": true
+  }
+},
+{
+  "model": "workouts.workoutprogram",
+  "pk": "home-morning",
+  "fields": {
+    "title": "Morning Wake Up",
+    "description": "Лёгкий старт дня для активации мышц и пробуждения тела.",
+    "duration_minutes": 18,
+    "calories": 150,
+    "intensity": "easy",
+    "mode": "home",
+    "tone": "tone-blue-card",
+    "tag": "Дома · Утро",
+    "is_featured": false,
+    "category": "",
+    "is_active": true
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 1,
+  "fields": {
+    "workout": "gym-fat-burn-power",
+    "template": 7,
+    "position": 1,
+    "sets": 4,
+    "reps": 12,
+    "weight": "Собственный вес",
+    "rest_seconds": 60
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 2,
+  "fields": {
+    "workout": "gym-fat-burn-power",
+    "template": 1,
+    "position": 2,
+    "sets": 4,
+    "reps": 15,
+    "weight": "50 кг",
+    "rest_seconds": 75
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 3,
+  "fields": {
+    "workout": "gym-fat-burn-power",
+    "template": 3,
+    "position": 3,
+    "sets": 3,
+    "reps": 12,
+    "weight": "40 кг",
+    "rest_seconds": 90
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 4,
+  "fields": {
+    "workout": "gym-fat-burn-power",
+    "template": 4,
+    "position": 4,
+    "sets": 3,
+    "reps": 12,
+    "weight": "35 кг",
+    "rest_seconds": 75
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 5,
+  "fields": {
+    "workout": "gym-fat-burn-power",
+    "template": 6,
+    "position": 5,
+    "sets": 3,
+    "reps": 45,
+    "weight": "—",
+    "rest_seconds": 45
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 6,
+  "fields": {
+    "workout": "gym-fullbody",
+    "template": 1,
+    "position": 1,
+    "sets": 4,
+    "reps": 12,
+    "weight": "60 кг",
+    "rest_seconds": 90
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 7,
+  "fields": {
+    "workout": "gym-fullbody",
+    "template": 3,
+    "position": 2,
+    "sets": 3,
+    "reps": 10,
+    "weight": "50 кг",
+    "rest_seconds": 90
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 8,
+  "fields": {
+    "workout": "gym-fullbody",
+    "template": 4,
+    "position": 3,
+    "sets": 3,
+    "reps": 12,
+    "weight": "40 кг",
+    "rest_seconds": 75
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 9,
+  "fields": {
+    "workout": "gym-fullbody",
+    "template": 8,
+    "position": 4,
+    "sets": 3,
+    "reps": 10,
+    "weight": "16 кг",
+    "rest_seconds": 60
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 10,
+  "fields": {
+    "workout": "gym-fullbody",
+    "template": 6,
+    "position": 5,
+    "sets": 3,
+    "reps": 40,
+    "weight": "—",
+    "rest_seconds": 45
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 11,
+  "fields": {
+    "workout": "gym-power",
+    "template": 1,
+    "position": 1,
+    "sets": 5,
+    "reps": 5,
+    "weight": "80 кг",
+    "rest_seconds": 180
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 12,
+  "fields": {
+    "workout": "gym-power",
+    "template": 2,
+    "position": 2,
+    "sets": 4,
+    "reps": 5,
+    "weight": "100 кг",
+    "rest_seconds": 180
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 13,
+  "fields": {
+    "workout": "gym-power",
+    "template": 3,
+    "position": 3,
+    "sets": 4,
+    "reps": 6,
+    "weight": "70 кг",
+    "rest_seconds": 150
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 14,
+  "fields": {
+    "workout": "gym-power",
+    "template": 4,
+    "position": 4,
+    "sets": 3,
+    "reps": 8,
+    "weight": "50 кг",
+    "rest_seconds": 120
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 15,
+  "fields": {
+    "workout": "gym-hiit",
+    "template": 7,
+    "position": 1,
+    "sets": 5,
+    "reps": 15,
+    "weight": "—",
+    "rest_seconds": 45
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 16,
+  "fields": {
+    "workout": "gym-hiit",
+    "template": 10,
+    "position": 2,
+    "sets": 4,
+    "reps": 60,
+    "weight": "—",
+    "rest_seconds": 30
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 17,
+  "fields": {
+    "workout": "gym-hiit",
+    "template": 9,
+    "position": 3,
+    "sets": 4,
+    "reps": 15,
+    "weight": "—",
+    "rest_seconds": 45
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 18,
+  "fields": {
+    "workout": "gym-hiit",
+    "template": 8,
+    "position": 4,
+    "sets": 3,
+    "reps": 12,
+    "weight": "—",
+    "rest_seconds": 45
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 19,
+  "fields": {
+    "workout": "gym-hiit",
+    "template": 6,
+    "position": 5,
+    "sets": 3,
+    "reps": 50,
+    "weight": "—",
+    "rest_seconds": 30
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 20,
+  "fields": {
+    "workout": "home-energy-flow",
+    "template": 9,
+    "position": 1,
+    "sets": 4,
+    "reps": 12,
+    "weight": "—",
+    "rest_seconds": 60
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 21,
+  "fields": {
+    "workout": "home-energy-flow",
+    "template": 1,
+    "position": 2,
+    "sets": 4,
+    "reps": 20,
+    "weight": "—",
+    "rest_seconds": 45
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 22,
+  "fields": {
+    "workout": "home-energy-flow",
+    "template": 6,
+    "position": 3,
+    "sets": 3,
+    "reps": 45,
+    "weight": "—",
+    "rest_seconds": 40
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 23,
+  "fields": {
+    "workout": "home-energy-flow",
+    "template": 8,
+    "position": 4,
+    "sets": 3,
+    "reps": 12,
+    "weight": "—",
+    "rest_seconds": 45
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 24,
+  "fields": {
+    "workout": "home-energy-flow",
+    "template": 7,
+    "position": 5,
+    "sets": 3,
+    "reps": 10,
+    "weight": "—",
+    "rest_seconds": 60
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 25,
+  "fields": {
+    "workout": "home-morning",
+    "template": 6,
+    "position": 1,
+    "sets": 3,
+    "reps": 30,
+    "weight": "—",
+    "rest_seconds": 30
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 26,
+  "fields": {
+    "workout": "home-morning",
+    "template": 1,
+    "position": 2,
+    "sets": 3,
+    "reps": 15,
+    "weight": "—",
+    "rest_seconds": 40
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 27,
+  "fields": {
+    "workout": "home-morning",
+    "template": 9,
+    "position": 3,
+    "sets": 3,
+    "reps": 10,
+    "weight": "—",
+    "rest_seconds": 45
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 28,
+  "fields": {
+    "workout": "home-morning",
+    "template": 8,
+    "position": 4,
+    "sets": 2,
+    "reps": 10,
+    "weight": "—",
+    "rest_seconds": 40
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 29,
+  "fields": {
+    "workout": "home-core",
+    "template": 6,
+    "position": 1,
+    "sets": 4,
+    "reps": 45,
+    "weight": "—",
+    "rest_seconds": 40
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 30,
+  "fields": {
+    "workout": "home-core",
+    "template": 8,
+    "position": 2,
+    "sets": 3,
+    "reps": 12,
+    "weight": "—",
+    "rest_seconds": 45
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 31,
+  "fields": {
+    "workout": "home-core",
+    "template": 9,
+    "position": 3,
+    "sets": 3,
+    "reps": 12,
+    "weight": "—",
+    "rest_seconds": 50
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 32,
+  "fields": {
+    "workout": "home-core",
+    "template": 1,
+    "position": 4,
+    "sets": 3,
+    "reps": 15,
+    "weight": "—",
+    "rest_seconds": 45
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 33,
+  "fields": {
+    "workout": "home-cardio",
+    "template": 7,
+    "position": 1,
+    "sets": 4,
+    "reps": 12,
+    "weight": "—",
+    "rest_seconds": 40
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 34,
+  "fields": {
+    "workout": "home-cardio",
+    "template": 10,
+    "position": 2,
+    "sets": 4,
+    "reps": 45,
+    "weight": "—",
+    "rest_seconds": 30
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 35,
+  "fields": {
+    "workout": "home-cardio",
+    "template": 1,
+    "position": 3,
+    "sets": 3,
+    "reps": 20,
+    "weight": "—",
+    "rest_seconds": 35
+  }
+},
+{
+  "model": "workouts.workoutexercise",
+  "pk": 36,
+  "fields": {
+    "workout": "home-cardio",
+    "template": 9,
+    "position": 4,
+    "sets": 3,
+    "reps": 15,
+    "weight": "—",
+    "rest_seconds": 40
+  }
+},
+{
+  "model": "nutrition.recipe",
+  "pk": "r1",
+  "fields": {
+    "title": "Омлет с индейкой",
+    "calories": 410,
+    "protein": 36,
+    "fats": 18,
+    "carbs": 22,
+    "prep_minutes": 15,
+    "ingredients": [
+      "3 яйца",
+      "80 г индейки",
+      "30 г шпината",
+      "1 ч.л. оливкового масла",
+      "Соль, перец"
+    ],
+    "steps": [
+      "Взбейте яйца с солью.",
+      "Обжарьте индейку 3 мин.",
+      "Добавьте шпинат и яйца, готовьте 4 мин под крышкой."
+    ],
+    "is_active": true
+  }
+},
+{
+  "model": "nutrition.recipe",
+  "pk": "r2",
+  "fields": {
+    "title": "Поке с тунцом",
+    "calories": 530,
+    "protein": 42,
+    "fats": 14,
+    "carbs": 56,
+    "prep_minutes": 20,
+    "ingredients": [
+      "120 г тунца",
+      "80 г риса",
+      "50 г огурца",
+      "30 г авокадо",
+      "Соевый соус, кунжут"
+    ],
+    "steps": [
+      "Сварите рис.",
+      "Нарежьте овощи.",
+      "Соберите боул: рис, тунец, овощи, соус."
+    ],
+    "is_active": true
+  }
+},
+{
+  "model": "nutrition.recipe",
+  "pk": "r3",
+  "fields": {
+    "title": "Греческий йогурт + ягоды",
+    "calories": 260,
+    "protein": 25,
+    "fats": 6,
+    "carbs": 27,
+    "prep_minutes": 5,
+    "ingredients": [
+      "200 г греческого йогурта",
+      "80 г ягод",
+      "15 г мёда",
+      "20 г гранолы"
+    ],
+    "steps": [
+      "Выложите йогурт в миску.",
+      "Добавьте ягоды и гранолу.",
+      "Полейте мёдом."
+    ],
+    "is_active": true
+  }
+},
+{
+  "model": "knowledge.article",
+  "pk": "a1",
+  "fields": {
+    "category": "nutrition",
+    "title": "Как считать БЖУ без стресса",
+    "read_time_minutes": 7,
+    "level": "base",
+    "body": "Начните с одного приёма пищи в день. Используйте простые эталоны: ладонь — белок, кулак — углеводы, большой палец — жиры.\n\nЧерез неделю добавьте второй приём. Цель — понимать порции, а не идеальная точность.",
+    "is_active": true,
+    "created_at": "2026-07-04T19:12:43.585Z"
+  }
+},
+{
+  "model": "knowledge.article",
+  "pk": "a2",
+  "fields": {
+    "category": "workout",
+    "title": "Прогрессия нагрузок: когда и как повышать вес",
+    "read_time_minutes": 9,
+    "level": "medium",
+    "body": "Повышайте вес, когда выполняете верхнюю границу повторений во всех подходах с хорошей техникой.\n\nШаг: +2.5 кг для верха тела, +5 кг для низа. Если техника ломается — останьтесь на текущем весе ещё 1–2 недели.",
+    "is_active": true,
+    "created_at": "2026-07-04T19:12:43.586Z"
+  }
+},
+{
+  "model": "knowledge.article",
+  "pk": "a3",
+  "fields": {
+    "category": "recovery",
+    "title": "Сон и результаты: сколько нужно спать",
+    "read_time_minutes": 6,
+    "level": "base",
+    "body": "7–9 часов — оптимальный диапазон для большинства. Недосып снижает восстановление и повышает тягу к сладкому.\n\nСтабильное время подъёма важнее «догоняющего» сна в выходные.",
+    "is_active": true,
+    "created_at": "2026-07-04T19:12:43.587Z"
+  }
+},
+{
+  "model": "knowledge.article",
+  "pk": "a4",
+  "fields": {
+    "category": "motivation",
+    "title": "Как не сорваться на 3-й неделе программы",
+    "read_time_minutes": 5,
+    "level": "base",
+    "body": "На 3-й неделе мотивация падает — это нормально. Сократите план до минимума: 2 тренировки вместо 4, но не ноль.\n\nОтметьте маленькую победу: вес, замеры или просто факт «я пришёл».",
+    "is_active": true,
+    "created_at": "2026-07-04T19:12:43.587Z"
+  }
+},
+{
+  "model": "knowledge.article",
+  "pk": "a5",
+  "fields": {
+    "category": "nutrition",
+    "title": "Рефид и читмил: в чем разница",
+    "read_time_minutes": 8,
+    "level": "medium",
+    "body": "Рефид — контролируемое повышение углеводов 1–2 дня для восстановления лептина.\n\nЧитмил — разовый «свободный» приём без строгого учёта. Рефид планируют, читмил — эмоциональная разгрузка.",
+    "is_active": true,
+    "created_at": "2026-07-04T19:12:43.588Z"
+  }
+}
+]

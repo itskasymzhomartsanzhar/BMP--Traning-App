@@ -1,4 +1,4 @@
-function RecipesCard({ recipes, onAction }) {
+function RecipesCard({ recipes, onRecipeClick }) {
   return (
     <div className="card nutrition-recipes animate-in delay-3">
       <h2>Рецепты</h2>
@@ -9,7 +9,7 @@ function RecipesCard({ recipes, onAction }) {
             key={recipe.id}
             type="button"
             className="recipe-row"
-            onClick={() => onAction(`Открыт рецепт: ${recipe.title}`)}
+            onClick={() => onRecipeClick?.(recipe)}
           >
             <div>
               <strong>{recipe.title}</strong>

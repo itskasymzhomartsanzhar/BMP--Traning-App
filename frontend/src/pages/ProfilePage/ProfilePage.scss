@@ -1,0 +1,164 @@
+.profile-main,
+.profile-list,
+.subscription-card,
+.calculator-card,
+.settings-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-main p {
+  color: var(--text-muted);
+}
+
+.profile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.profile-tags span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.profile-row,
+.toggle-row {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0 12px;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profile-row strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.subscription-line {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-muted);
+}
+
+.subscription-line strong {
+  color: var(--text-main);
+}
+
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.calc-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.calc-grid input,
+.calc-grid select {
+  width: 100%;
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  padding: 0 10px;
+}
+
+.calc-result {
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.toggle {
+  min-width: 48px;
+  min-height: 26px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.toggle.is-on {
+  color: #1d1d1d;
+  background: var(--success);
+  border-color: var(--success);
+}
+
+.profile-extra-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.profile-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-action-btn {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 14px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: border-color 0.15s;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  &:active { opacity: 0.8; }
+}
+
+.profile-action-btn--premium {
+  border-color: rgba(232, 201, 143, 0.35);
+  background: linear-gradient(135deg, rgba(36, 30, 22, 0.9), rgba(26, 24, 20, 0.9));
+  color: #f2eac7;
+
+  svg { color: #f2eac7; }
+}
+
+.settings-tg-link span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  svg {
+    color: #2aabee;
+    font-size: 17px;
+  }
+}
+
+.settings-logout span:first-child {
+  color: #e5877f;
+}

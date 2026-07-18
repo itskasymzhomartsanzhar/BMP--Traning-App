@@ -1,6 +1,6 @@
 import { FaPen } from 'react-icons/fa6'
 
-function GoalCard({ goal, onEdit, onDayClick }) {
+function GoalCard({ goal, selectedDayId, onEdit, onDayClick }) {
   return (
     <div className="weekly-goal card animate-in delay-1">
       <div className="weekly-goal__top">
@@ -19,7 +19,7 @@ function GoalCard({ goal, onEdit, onDayClick }) {
           <button
             key={day.id}
             type="button"
-            className={`goal-day ${day.state === 'active' ? 'is-active' : day.state === 'done' ? 'is-done' : ''}`}
+            className={`goal-day ${day.state === 'active' ? 'is-active' : day.state === 'done' ? 'is-done' : day.scheduled ? 'is-scheduled' : 'is-rest'}${day.id === selectedDayId ? ' is-selected' : ''}`}
             onClick={() => onDayClick(day)}
           >
             <span className="goal-day__label">{day.label}</span>

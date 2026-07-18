@@ -1,0 +1,126 @@
+.chart-card,
+.params-card,
+.photo-card,
+.activity-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.params-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chart-card__empty,
+.params-card__empty,
+.photo-card__empty {
+  margin: 4px 0;
+  padding: 22px 18px;
+  text-align: center;
+  line-height: 1.5;
+  color: var(--text-muted);
+  background: var(--bg-soft);
+  border: 1px dashed var(--line);
+  border-radius: 14px;
+}
+
+.ghost {
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font-size: 18px;
+  padding: 4px 8px;
+}
+
+.chart-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chart-wrapper svg {
+  width: 100%;
+  border-radius: 12px;
+  background: #121212;
+  border: 1px solid var(--line);
+}
+
+.chart-labels {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.chart-value {
+  color: var(--accent);
+}
+
+.params-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.param-row {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  min-height: 44px;
+  padding: 0 12px;
+  background: var(--bg-surface);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.photo-tile {
+  min-height: 86px;
+  border-radius: 10px;
+  border: 1px dashed #5e5345;
+  background: #171717;
+  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.photo-tile small {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.bars {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: end;
+  gap: 8px;
+  min-height: 120px;
+}
+
+.bar-item {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.bar {
+  width: 16px;
+  border-radius: 99px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-dark));
+}

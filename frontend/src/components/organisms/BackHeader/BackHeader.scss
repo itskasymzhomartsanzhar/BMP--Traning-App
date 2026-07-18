@@ -1,0 +1,40 @@
+.back-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.back-header__btn {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--bg-surface);
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.back-header__text {
+  flex: 1;
+  min-width: 0;
+
+  h1 {
+    font-size: 28px;
+    line-height: 1.05;
+  }
+
+  p {
+    margin-top: 4px;
+    font-size: 13px;
+  }
+}

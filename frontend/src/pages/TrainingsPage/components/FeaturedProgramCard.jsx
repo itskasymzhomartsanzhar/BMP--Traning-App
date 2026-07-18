@@ -1,23 +1,25 @@
 import { FaFireFlameSimple, FaPlay } from 'react-icons/fa6'
 
-function FeaturedProgramCard({ data, onAction }) {
+function FeaturedProgramCard({ data, onOpen }) {
   return (
     <article className={`featured-training card animate-in delay-2 ${data.tone}`}>
-      <div className="featured-training__content">
-        <h2>{data.title}</h2>
-        <p>{data.subtitle}</p>
-      </div>
+      <button type="button" className="featured-training__open" onClick={onOpen}>
+        <div className="featured-training__content">
+          <h2>{data.title}</h2>
+          <p>{data.subtitle}</p>
+        </div>
+      </button>
 
       <div className="featured-training__meta">
-        <button type="button" className="meta-pill" onClick={() => onAction(`Длительность: ${data.duration}`)}>
+        <span className="meta-pill">
           <FaPlay aria-hidden="true" />
           <span>{data.duration}</span>
-        </button>
+        </span>
 
-        <button type="button" className="meta-pill" onClick={() => onAction(`Расход: ${data.calories}`)}>
+        <span className="meta-pill">
           <FaFireFlameSimple aria-hidden="true" />
           <span>{data.calories}</span>
-        </button>
+        </span>
       </div>
     </article>
   )

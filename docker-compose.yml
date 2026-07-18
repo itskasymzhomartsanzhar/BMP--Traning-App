@@ -1,0 +1,81 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-tres}
+      POSTGRES_USER: ${POSTGRES_USER:-tres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Задайте POSTGRES_PASSWORD в .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tres} -d ${POSTGRES_DB:-tres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      SECRET_KEY: ${SECRET_KEY:?Задайте SECRET_KEY в .env}
+      DEBUG: "False"
+      ALLOWED_HOSTS: tresfit.ru,www.tresfit.ru,backend
+      CSRF_TRUSTED_ORIGINS: https://tresfit.ru,https://www.tresfit.ru
+      POSTGRES_DB: ${POSTGRES_DB:-tres}
+      POSTGRES_USER: ${POSTGRES_USER:-tres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_DEV_MODE: "False"
+      YOOKASSA_SHOP_ID: ${YOOKASSA_SHOP_ID:-}
+      YOOKASSA_SECRET_KEY: ${YOOKASSA_SECRET_KEY:-}
+      DJANGO_SUPERUSER_TG_ID: ${DJANGO_SUPERUSER_TG_ID:-}
+      DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD:-}
+    volumes:
+      - static:/app/staticfiles
+      - media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+
+  nginx:
+    build:
+      context: .
+      dockerfile: deploy/nginx/Dockerfile
+      args:
+        VITE_API_URL: /api
+        VITE_TG_BOT_USERNAME: ${VITE_TG_BOT_USERNAME:-}
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-webroot:/var/www/certbot
+      - static:/app/staticfiles:ro
+      - media:/app/media:ro
+    depends_on:
+      - backend
+
+  certbot:
+    image: certbot/certbot
+    restart: unless-stopped
+    entrypoint: ["sh", "/entrypoint.sh"]
+    environment:
+      DOMAIN: tresfit.ru
+      CERTBOT_EMAIL: ${CERTBOT_EMAIL:?Задайте CERTBOT_EMAIL в .env}
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-webroot:/var/www/certbot
+      - ./deploy/certbot/entrypoint.sh:/entrypoint.sh:ro
+    depends_on:
+      - nginx
+
+volumes:
+  pgdata:
+  static:
+  media:
+  certbot-etc:
+  certbot-webroot:

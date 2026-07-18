@@ -15,7 +15,7 @@
 
 .weekly-goal {
   background:
-    radial-gradient(circle at 88% 5%, rgba(214, 198, 187, 0.16), transparent 40%),
+    radial-gradient(circle at 88% 5%, rgba(232, 201, 143, 0.16), transparent 40%),
     linear-gradient(160deg, #1a1a1a, #151515 62%);
   border: 1px solid #3a3a3a;
   border-radius: 24px;
@@ -43,7 +43,7 @@
   min-width: 86px;
   height: 38px;
   border-radius: 999px;
-  border: 1px solid rgba(214, 198, 187, 0.35);
+  border: 1px solid rgba(232, 201, 143, 0.35);
   background: linear-gradient(180deg, #d6c6bb, #c8bba0);
   color: #151515;
   display: inline-flex;

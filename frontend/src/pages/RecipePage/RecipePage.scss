@@ -1,0 +1,48 @@
+.recipe-macros {
+  color: var(--accent);
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.recipe-list-items {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.recipe-steps {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+
+    span {
+      width: 26px;
+      height: 26px;
+      flex-shrink: 0;
+      border-radius: 8px;
+      background: rgba(232, 201, 143, 0.15);
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    p {
+      color: var(--text-main);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  }
+}

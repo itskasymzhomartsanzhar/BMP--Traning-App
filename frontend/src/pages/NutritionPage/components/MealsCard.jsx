@@ -1,4 +1,4 @@
-function MealsCard({ meals, onAction }) {
+function MealsCard({ meals, onMealClick, onAddMeal }) {
   return (
     <div className="card nutrition-meals animate-in delay-2">
       <h2>Приемы пищи</h2>
@@ -9,7 +9,7 @@ function MealsCard({ meals, onAction }) {
             key={meal.id}
             type="button"
             className="meal-row"
-            onClick={() => onAction(`${meal.title} · ${meal.kcal} ккал`)}
+            onClick={() => onMealClick?.(meal)}
           >
             <div>
               <strong>{meal.title}</strong>
@@ -23,7 +23,7 @@ function MealsCard({ meals, onAction }) {
         ))}
       </div>
 
-      <button type="button" className="primary" onClick={() => onAction('Добавление приема пищи')}>
+      <button type="button" className="primary" onClick={onAddMeal}>
         Добавить прием пищи
       </button>
     </div>

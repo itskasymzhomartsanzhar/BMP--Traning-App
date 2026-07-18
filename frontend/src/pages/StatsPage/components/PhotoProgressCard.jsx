@@ -1,18 +1,21 @@
-function PhotoProgressCard({ photos, onAction }) {
+function PhotoProgressCard({ photos, onPhotoClick }) {
   return (
     <div className="card photo-card animate-in delay-2">
       <h2>Фото прогресса</h2>
-      <div className="photo-grid">
-        {photos.map((date) => (
-          <button type="button" key={date} className="photo-tile" onClick={() => onAction(`Открыто фото от ${date}`)}>
-            <span>{date}</span>
-            <small>Фронт / бок</small>
-          </button>
-        ))}
-      </div>
-      <button type="button" className="primary" onClick={() => onAction('Кнопка загрузки фото нажата')}>
-        Добавить фото
-      </button>
+      {photos.length > 0 ? (
+        <div className="photo-grid">
+          {photos.map((date) => (
+            <button type="button" key={date} className="photo-tile" onClick={() => onPhotoClick?.(date)}>
+              <span>{date}</span>
+              <small>Фронт / бок</small>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <p className="photo-card__empty">
+          делаем потом.
+        </p>
+      )}
     </div>
   )
 }

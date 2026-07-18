@@ -1,0 +1,29 @@
+// Design tokens — warm dark fitness theme
+$bg-main: #121110;
+$bg-surface: #1c1a17;
+$bg-soft: #26231e;
+$bg-deep: #050504;
+$text-main: #f4ede3;
+$text-muted: #b6a789;
+$line: #423d34;
+$accent: #e8c98f;
+$accent-strong: #d4af6a;
+$accent-dark: #8a6d3b;
+$success: #8fce8f;
+$premium-light: #ffe9a6;
+$premium-mid: #e6c574;
+
+:root {
+  --bg-main: #{$bg-main};
+  --bg-surface: #{$bg-surface};
+  --bg-soft: #{$bg-soft};
+  --text-main: #{$text-main};
+  --text-muted: #{$text-muted};
+  --line: #{$line};
+  --accent: #{$accent};
+  --accent-strong: #{$accent-strong};
+  --accent-dark: #{$accent-dark};
+  --success: #{$success};
+  --font-main: 'Inter', 'SF Pro Text', system-ui, sans-serif;
+  --font-display: 'Syne', 'SF Pro Display', system-ui, sans-serif;
+}

@@ -1,0 +1,11 @@
+.article-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  p {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--text-main);
+  }
+}
