@@ -1,0 +1,220 @@
+.landing {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  padding: 0 24px calc(28px + env(safe-area-inset-bottom));
+  background: #0a0a0a;
+  color: #f4ede3;
+  overflow: hidden;
+}
+
+.landing__glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 45% at 50% 18%, rgba(232, 201, 143, 0.07), transparent 65%),
+    radial-gradient(ellipse 70% 35% at 50% 100%, rgba(212, 175, 106, 0.05), transparent 70%);
+}
+
+// --- Герой: буквы TRES за человеком ---
+
+.landing__hero {
+  position: relative;
+  flex: 1;
+  height: 56svh;
+  min-height: 380px;
+  margin: 0 -24px;
+}
+
+.landing__person {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 4%;
+  transform: translateX(-50%);
+  height: 96%;
+  width: auto;
+  max-width: none;
+  filter: grayscale(1) contrast(1.05);
+  // мягкое растворение в фон снизу, как на макете
+  -webkit-mask-image: linear-gradient(180deg, #000 76%, transparent 98%);
+  mask-image: linear-gradient(180deg, #000 76%, transparent 98%);
+  animation: landing-person 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.landing__brand {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: 26%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(84px, 26vw, 150px);
+  line-height: 1;
+  letter-spacing: 0.18em;
+  margin-right: -0.18em; // компенсация трекинга последней буквы для центровки
+  white-space: nowrap;
+  background: linear-gradient(175deg, #f0d9a6 20%, #d4af6a 55%, #8a6d3b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: landing-fade 0.9s ease 0.15s both;
+}
+
+.landing__eco {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: 13%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: clamp(13px, 4vw, 19px);
+  letter-spacing: 0.52em;
+  margin-right: -0.52em;
+  white-space: nowrap;
+  color: #cbb98e;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.8);
+  animation: landing-fade 0.9s ease 0.3s both;
+}
+
+// --- Меню ---
+
+.landing__menu {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 26px;
+  padding: 40px 4px 0;
+}
+
+.landing__item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-display);
+  font-size: 21px;
+  letter-spacing: 0.14em;
+  color: #e9e2d6;
+  animation: landing-rise 0.7s ease both;
+
+  &:nth-child(1) { animation-delay: 0.45s; }
+  &:nth-child(2) { animation-delay: 0.55s; }
+  &:nth-child(3) { animation-delay: 0.65s; }
+}
+
+.landing__item--active {
+  color: #d9b877;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.1s ease;
+
+  &:hover {
+    color: #f0d9a6;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+.landing__item--soon {
+  opacity: 0.85;
+
+  small {
+    font-family: var(--font-main);
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    color: #6f6552;
+    border: 1px solid #3a352b;
+    border-radius: 999px;
+    padding: 3px 8px;
+    transform: translateY(-2px);
+  }
+}
+
+// --- Подвал с эмблемой ---
+
+// Без opacity-анимации: она изолирует mix-blend логотипа,
+// и на время появления вокруг эмблемы проступал бы фон png.
+.landing__foot {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-top: 44px;
+}
+
+.landing__logo {
+  width: 56px;
+  height: 51px;
+  object-fit: contain;
+}
+
+.landing__logo-text {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.5em;
+  margin-right: -0.5em;
+  color: #cbb98e;
+}
+
+@keyframes landing-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes landing-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes landing-person {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(16px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing__person,
+  .landing__brand,
+  .landing__eco,
+  .landing__item,
+  .landing__foot {
+    animation: none;
+  }
+}
+
+// Планшет и шире: ограничиваем сцену по центру
+@media (min-width: 640px) {
+  .landing__hero {
+    margin: 0 auto;
+    width: min(100%, 560px);
+  }
+
+  .landing__menu,
+  .landing__foot {
+    width: min(100%, 560px);
+    margin: 0 auto;
+  }
+}

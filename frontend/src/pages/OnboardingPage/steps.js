@@ -1,7 +1,6 @@
 export const GENDER_OPTIONS = [
   { id: 'male', label: 'Мужской' },
   { id: 'female', label: 'Женский' },
-  { id: 'other', label: 'Другое' },
 ]
 
 export const GOAL_OPTIONS = [
@@ -32,7 +31,28 @@ export const INJURY_OPTIONS = [
   { id: 'ankle', label: 'Голеностоп' },
 ]
 
-export const STEPS = ['name', 'birth', 'body', 'goal', 'level', 'injuries']
+export const DAY_OPTIONS = [
+  { id: 'mon', label: 'Пн' },
+  { id: 'tue', label: 'Вт' },
+  { id: 'wed', label: 'Ср' },
+  { id: 'thu', label: 'Чт' },
+  { id: 'fri', label: 'Пт' },
+  { id: 'sat', label: 'Сб' },
+  { id: 'sun', label: 'Вс' },
+]
+
+const DAY_ORDER = DAY_OPTIONS.map((d) => d.id)
+
+// Стартовая расстановка дней — как в рекомендации бэкенда (recommendation.py).
+export const DAYS_BY_LEVEL = {
+  beginner: ['mon', 'thu'],
+  intermediate: ['mon', 'wed', 'fri'],
+  advanced: ['mon', 'tue', 'thu', 'sat'],
+}
+
+export const sortDays = (days) => [...days].sort((a, b) => DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b))
+
+export const STEPS = ['name', 'birth', 'body', 'goal', 'level', 'injuries', 'days']
 
 export function calcAge(birthDate) {
   if (!birthDate) return null
@@ -77,6 +97,10 @@ export function validateStep(step, form) {
     if (!form.place) errors.place = 'Выберите, где будете тренироваться'
   }
 
+  if (step === 'days' && form.trainingDays.length === 0) {
+    errors.days = 'Выберите хотя бы один день'
+  }
+
   return errors
 }
 
@@ -95,5 +119,6 @@ export function buildPayload(form) {
     level: form.level,
     place: form.place,
     injuries,
+    training_days: sortDays(form.trainingDays),
   }
 }

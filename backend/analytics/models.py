@@ -23,8 +23,9 @@ class BodyMeasurement(models.Model):
     weight = models.FloatField('Вес, кг', null=True, blank=True)
     body_fat_percent = models.FloatField('Процент жира, %', null=True, blank=True)
     muscle_mass = models.FloatField('Мышечная масса, кг', null=True, blank=True)
-    waist_cm = models.IntegerField('Талия, см', null=True, blank=True)
+    neck_cm = models.IntegerField('Шея, см', null=True, blank=True)
     chest_cm = models.IntegerField('Грудь, см', null=True, blank=True)
+    waist_cm = models.IntegerField('Талия, см', null=True, blank=True)
     hip_cm = models.IntegerField('Бёдра, см', null=True, blank=True)
 
     class Meta:

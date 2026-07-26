@@ -34,7 +34,7 @@ function ProfilePage() {
     const mapped = {
       display_name: nextUser.name,
       email: nextUser.email,
-      gender: { 'Мужской': 'male', 'Женский': 'female', 'Другое': 'other' }[nextUser.gender] || nextUser.gender,
+      gender: { 'Мужской': 'male', 'Женский': 'female' }[nextUser.gender] || nextUser.gender,
       weight: nextUser.weight,
       height: nextUser.height,
       goal: { 'Сушка': 'cut', 'Набор массы': 'bulk', 'Поддержание': 'maintain', 'Выносливость': 'endurance', 'Рекомпозиция': 'recomp' }[nextUser.goal] || nextUser.goal,

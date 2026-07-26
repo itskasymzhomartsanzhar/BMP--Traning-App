@@ -13,7 +13,7 @@ class WeightEntryAdmin(admin.ModelAdmin):
 
 @admin.register(BodyMeasurement)
 class BodyMeasurementAdmin(admin.ModelAdmin):
-    list_display = ['user', 'recorded_at', 'weight', 'body_fat_percent', 'muscle_mass', 'waist_cm']
+    list_display = ['user', 'recorded_at', 'weight', 'neck_cm', 'chest_cm', 'waist_cm', 'hip_cm']
     list_filter = ['recorded_at']
     search_fields = ['user__display_name', 'user__tg_id']
     list_select_related = ['user']

@@ -1,12 +1,37 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FaXmark, FaCalculator } from 'react-icons/fa6'
-import { INITIAL_CALCULATOR_FORM } from '../../../data/mockData'
+import { useAppUI } from '../../../context/AppUIContext'
+import { getWeightHistory } from '../../../api/analytics'
 import './CalculatorModal.scss'
 
+// Цели профиля шире, чем режимы калькулятора — сводим к трём.
+const GOAL_TO_CALC = { cut: 'cut', bulk: 'bulk', maintain: 'maintain', endurance: 'maintain', recomp: 'maintain' }
+
 function CalculatorModal({ onClose }) {
+  const { userProfile } = useAppUI()
   const [type, setType] = useState('tdee')
-  const [form, setForm] = useState(INITIAL_CALCULATOR_FORM)
+  // По умолчанию — данные из опроса/профиля; вес уточняется свежим замером ниже.
+  const [form, setForm] = useState(() => ({
+    weight: userProfile?.weight != null ? String(userProfile.weight) : '',
+    height: userProfile?.height != null ? String(userProfile.height) : '',
+    age: userProfile?.age != null ? String(userProfile.age) : '',
+    activity: '1.55',
+    goal: GOAL_TO_CALC[userProfile?.goal] || 'maintain',
+    gender: userProfile?.gender === 'female' ? 'female' : 'male',
+  }))
   const [result, setResult] = useState(null)
+
+  useEffect(() => {
+    // Актуальный вес — последний замер; профиль в контексте мог устареть за сессию.
+    getWeightHistory()
+      .then(({ data }) => {
+        const last = Array.isArray(data) && data.length > 0 ? data[data.length - 1] : null
+        if (last?.value) {
+          setForm((prev) => ({ ...prev, weight: String(last.value) }))
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   const setField = (field, value) => setForm((prev) => ({ ...prev, [field]: value }))
 

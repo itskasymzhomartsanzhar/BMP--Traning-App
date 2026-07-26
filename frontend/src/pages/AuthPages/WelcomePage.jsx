@@ -1,5 +1,5 @@
 import { Navigate, useNavigate } from 'react-router-dom'
-import { FaDumbbell, FaBowlFood, FaChartLine } from 'react-icons/fa6'
+import { FaArrowLeft, FaDumbbell, FaBowlFood, FaChartLine } from 'react-icons/fa6'
 import { useAppUI } from '../../context/AppUIContext'
 import TelegramLoginButton, { telegramWidgetConfigured } from '../../components/common/TelegramLoginButton'
 import './AuthPages.scss'
@@ -21,6 +21,12 @@ function WelcomePage() {
       <div className="auth-page__bg" aria-hidden="true" />
 
       <div className="auth-page__content">
+        <div className="auth-form__head">
+          <button type="button" className="auth-form__back" onClick={() => navigate('/landing')} aria-label="К лендингу">
+            <FaArrowLeft />
+          </button>
+        </div>
+
         <div className="welcome__hero">
           <h1 className="welcome__brand">TRES</h1>
           <p className="welcome__tagline">

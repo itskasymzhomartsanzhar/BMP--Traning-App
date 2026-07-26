@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -141,7 +142,7 @@ class MeasurementsView(APIView):
             recorded_at=recorded_at,
         )
 
-        fields = ['weight', 'body_fat_percent', 'muscle_mass', 'waist_cm', 'chest_cm', 'hip_cm']
+        fields = ['weight', 'body_fat_percent', 'muscle_mass', 'neck_cm', 'chest_cm', 'waist_cm', 'hip_cm']
         changed = []
         for field in fields:
             if field in request.data:
@@ -166,33 +167,55 @@ def _measurement_to_dict(m):
         result.append({'label': 'Процент жира', 'value': f'{m.body_fat_percent}%', 'field': 'body_fat_percent'})
     if m.muscle_mass is not None:
         result.append({'label': 'Мышечная масса', 'value': f'{m.muscle_mass} кг', 'field': 'muscle_mass'})
-    if m.waist_cm is not None:
-        result.append({'label': 'Талия', 'value': f'{m.waist_cm} см', 'field': 'waist_cm'})
+    # Обхваты — сверху вниз по телу: шея, грудь, талия, бёдра.
+    if m.neck_cm is not None:
+        result.append({'label': 'Шея', 'value': f'{m.neck_cm} см', 'field': 'neck_cm'})
     if m.chest_cm is not None:
         result.append({'label': 'Грудь', 'value': f'{m.chest_cm} см', 'field': 'chest_cm'})
+    if m.waist_cm is not None:
+        result.append({'label': 'Талия', 'value': f'{m.waist_cm} см', 'field': 'waist_cm'})
     if m.hip_cm is not None:
-        result.append({'label': 'Бедро', 'value': f'{m.hip_cm} см', 'field': 'hip_cm'})
+        result.append({'label': 'Бёдра', 'value': f'{m.hip_cm} см', 'field': 'hip_cm'})
     return result
 
 
 class ProgressPhotosView(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    MAX_SIZE = 15 * 1024 * 1024
+
+    def _serialize(self, request, photo):
+        return {
+            'id': photo.id,
+            'date': photo.taken_date.isoformat(),
+            'date_display': photo.taken_date.strftime('%d.%m.%Y'),
+            'angle': photo.angle,
+            'url': request.build_absolute_uri(photo.image.url) if photo.image else '',
+        }
 
     def get(self, request):
         from analytics.models import ProgressPhoto
-        photos = ProgressPhoto.objects.filter(user=request.user).order_by('-taken_date')
-        dates = list(dict.fromkeys(p.taken_date.strftime('%d.%m') for p in photos))
-        return Response(dates)
+        # По возрастанию даты: ползунок ведёт слева направо от старых к новым.
+        photos = ProgressPhoto.objects.filter(user=request.user).order_by('taken_date', 'id')
+        return Response([self._serialize(request, p) for p in photos])
 
     def post(self, request):
         from analytics.models import ProgressPhoto
         from rest_framework import status as drf_status
-        taken_date = request.data.get('date', str(date.today()))
-        angle = request.data.get('angle', 'front')
+
         photo_file = request.FILES.get('file')
         if not photo_file:
-            return Response({'detail': 'file required'}, status=drf_status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'Файл не передан.'}, status=drf_status.HTTP_400_BAD_REQUEST)
+        if photo_file.size > self.MAX_SIZE:
+            return Response({'detail': 'Файл больше 15 МБ.'}, status=drf_status.HTTP_400_BAD_REQUEST)
+        if not (photo_file.content_type or '').startswith('image/'):
+            return Response({'detail': 'Можно загружать только изображения.'}, status=drf_status.HTTP_400_BAD_REQUEST)
+
         photo = ProgressPhoto.objects.create(
-            user=request.user, taken_date=taken_date, angle=angle, image=photo_file
+            user=request.user,
+            taken_date=date.today(),
+            angle=request.data.get('angle', 'front'),
+            image=photo_file,
         )
-        return Response({'id': photo.id, 'date': photo.taken_date.strftime('%d.%m'), 'angle': photo.angle, 'url': photo.image.url if photo.image else ''})
+        return Response(self._serialize(request, photo), status=drf_status.HTTP_201_CREATED)

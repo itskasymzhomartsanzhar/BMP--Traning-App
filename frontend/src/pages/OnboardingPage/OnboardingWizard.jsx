@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { FaArrowLeft, FaCheck } from 'react-icons/fa6'
 import {
   GENDER_OPTIONS, GOAL_OPTIONS, LEVEL_OPTIONS, PLACE_OPTIONS, INJURY_OPTIONS,
-  STEPS, calcAge, validateStep, buildPayload,
+  DAY_OPTIONS, DAYS_BY_LEVEL, STEPS, calcAge, validateStep, buildPayload,
 } from './steps'
 import './OnboardingPage.scss'
 
@@ -16,6 +16,7 @@ const INITIAL_FORM = {
   level: '',
   place: '',
   injuries: [],
+  trainingDays: [],
 }
 
 function extractApiError(error) {
@@ -71,6 +72,21 @@ function OnboardingWizard({ initialName = '', onSubmit, onBackFromFirst, submitL
     setStepIndex((i) => i - 1)
   }
 
+  const toggleDay = (id) => {
+    setForm((prev) => ({
+      ...prev,
+      trainingDays: prev.trainingDays.includes(id)
+        ? prev.trainingDays.filter((d) => d !== id)
+        : [...prev.trainingDays, id],
+    }))
+    setErrors((prev) => {
+      if (!prev.days) return prev
+      const next = { ...prev }
+      delete next.days
+      return next
+    })
+  }
+
   const goNext = () => {
     const stepErrors = validateStep(step, form)
     if (Object.keys(stepErrors).length > 0) {
@@ -78,6 +94,10 @@ function OnboardingWizard({ initialName = '', onSubmit, onBackFromFirst, submitL
       return
     }
     if (stepIndex < STEPS.length - 1) {
+      // Входим на шаг дней впервые — подставляем рекомендацию по уровню.
+      if (STEPS[stepIndex + 1] === 'days' && form.trainingDays.length === 0) {
+        setForm((prev) => ({ ...prev, trainingDays: DAYS_BY_LEVEL[prev.level] ?? DAYS_BY_LEVEL.intermediate }))
+      }
       setStepIndex((i) => i + 1)
       return
     }
@@ -274,6 +294,29 @@ function OnboardingWizard({ initialName = '', onSubmit, onBackFromFirst, submitL
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {step === 'days' && (
+          <div className="onb__step">
+            <h1 className="onb__title">Дни тренировок</h1>
+            <p className="onb__subtitle">
+              Мы отметили дни под ваш уровень — поменяйте, как удобно.
+              Выбрано: <strong>{form.trainingDays.length}</strong> в неделю.
+            </p>
+            <div className="onb__chips onb__chips--days">
+              {DAY_OPTIONS.map((day) => (
+                <button
+                  key={day.id}
+                  type="button"
+                  className={`onb-chip${form.trainingDays.includes(day.id) ? ' is-selected' : ''}`}
+                  onClick={() => toggleDay(day.id)}
+                >
+                  {day.label}
+                </button>
+              ))}
+            </div>
+            {errors.days && <span className="onb__error">{errors.days}</span>}
             {errors.submit && <span className="onb__error">{errors.submit}</span>}
           </div>
         )}
@@ -284,7 +327,11 @@ function OnboardingWizard({ initialName = '', onSubmit, onBackFromFirst, submitL
           type="button"
           className="onb__next"
           onClick={goNext}
-          disabled={saving || (step === 'injuries' && form.injuries.length === 0)}
+          disabled={
+            saving
+            || (step === 'injuries' && form.injuries.length === 0)
+            || (step === 'days' && form.trainingDays.length === 0)
+          }
         >
           {saving
             ? 'Подбираем план…'

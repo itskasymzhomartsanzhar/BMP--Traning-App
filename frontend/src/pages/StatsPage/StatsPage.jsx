@@ -2,13 +2,15 @@ import { useEffect, useState } from 'react'
 import { useAppUI } from '../../context/AppUIContext'
 import {
   getActivity, getWeightHistory, addWeight,
-  getMeasurements, addMeasurement, getProgressPhotos,
+  getMeasurements, getProgressPhotos,
 } from '../../api/analytics'
 import SectionHead from '../../components/common/SectionHead'
 import ProgressTabs from './components/ProgressTabs'
 import WeightChartCard from './components/WeightChartCard'
 import MeasurementsCard from './components/MeasurementsCard'
+import MeasurementModal from './components/MeasurementModal'
 import PhotoProgressCard from './components/PhotoProgressCard'
+import PhotoCaptureModal from './components/PhotoCaptureModal'
 import ActivityCard from './components/ActivityCard'
 import './StatsPage.scss'
 
@@ -20,6 +22,8 @@ function StatsPage() {
   const [weightHistory, setWeightHistory] = useState([])
   const [measurements, setMeasurements] = useState([])
   const [photos, setPhotos] = useState([])
+  const [captureOpen, setCaptureOpen] = useState(false)
+  const [measureOpen, setMeasureOpen] = useState(false)
 
   useEffect(() => {
     getActivity().then(({ data }) => setActivity(data)).catch(() => {})
@@ -54,40 +58,6 @@ function StatsPage() {
     })
   }
 
-  const handleEditMeasurement = (item) => {
-    const currentNumeric = parseFloat(String(item.value).replace(',', '.')) || ''
-    showModal({
-      title: `Изменить: ${item.label}`,
-      message: `Текущее значение: ${item.value}`,
-      input: { type: 'number', step: '0.1', defaultValue: currentNumeric, placeholder: 'Новое значение' },
-      actions: [
-        { label: 'Отмена', variant: 'secondary', onClick: () => {} },
-        {
-          label: 'Сохранить',
-          variant: 'primary',
-          onClick: (inputValue) => {
-            const val = parseFloat(inputValue || '0')
-            const today = new Date().toISOString().slice(0, 10)
-            const fieldMap = {
-              'Текущий вес': 'weight', 'Процент жира': 'body_fat_percent',
-              'Мышечная масса': 'muscle_mass', 'Талия': 'waist_cm',
-              'Грудь': 'chest_cm', 'Бедро': 'hip_cm',
-            }
-            const field = fieldMap[item.label]
-            if (!field) return
-            if (!(val > 0)) {
-              showToast('Введите значение больше нуля')
-              return
-            }
-            addMeasurement({ [field]: val, recorded_at: today })
-              .then(() => getMeasurements().then(({ data }) => setMeasurements(data ?? [])))
-              .catch(() => showToast('Не удалось сохранить замер'))
-          },
-        },
-      ],
-    })
-  }
-
   return (
     <section className="page page-stats">
       <SectionHead title="Аналитика" />
@@ -103,17 +73,24 @@ function StatsPage() {
         </>
       )}
       {activeTab === 'measurements' && (
-        <MeasurementsCard
-          measurements={measurements}
-          onEdit={(item) => handleEditMeasurement(item ?? measurements[0])}
-        />
+        <MeasurementsCard measurements={measurements} onEdit={() => setMeasureOpen(true)} />
       )}
       {activeTab === 'photo' && (
-        <PhotoProgressCard
-          photos={photos}
-          onPhotoClick={(date) =>
-            showInfo(`Фото прогресса · ${date}`, 'Ракурсы: Спереди · Сбоку · Сзади')
-          }
+        <PhotoProgressCard photos={photos} onAdd={() => setCaptureOpen(true)} />
+      )}
+
+      {captureOpen && (
+        <PhotoCaptureModal
+          onClose={() => setCaptureOpen(false)}
+          onUploaded={(photo) => setPhotos((prev) => [...prev, photo])}
+        />
+      )}
+
+      {measureOpen && (
+        <MeasurementModal
+          current={measurements}
+          onClose={() => setMeasureOpen(false)}
+          onSaved={(data) => setMeasurements(data ?? [])}
         />
       )}
 

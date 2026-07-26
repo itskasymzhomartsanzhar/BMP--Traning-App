@@ -3,7 +3,7 @@ import { useAppUI } from '../../context/AppUIContext'
 
 // Гостю доступны только эти маршруты; в мини-аппе они не нужны —
 // там автовход по initData и сразу опрос.
-const GUEST_ROUTES = ['/welcome', '/login', '/register']
+const GUEST_ROUTES = ['/landing', '/welcome', '/login', '/register']
 
 function AuthGate({ children }) {
   const { authStatus, isOnboarded } = useAppUI()
@@ -14,7 +14,7 @@ function AuthGate({ children }) {
 
   if (authStatus === 'guest') {
     if (GUEST_ROUTES.includes(path)) return children
-    return <Navigate to="/welcome" replace />
+    return <Navigate to="/landing" replace />
   }
 
   // Авторизованных с guest-маршрутов уводят сами страницы: RegisterPage

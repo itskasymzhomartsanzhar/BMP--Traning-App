@@ -184,6 +184,7 @@ class DashboardView(APIView):
             'greeting': f'Привет, {user.name}!',
             'stats': {
                 'current_weight': weight_display,
+                'current_weight_kg': user.weight,
                 'total_workouts': user.workout_count,
                 'activity_days': activity_days,
             },
@@ -266,7 +267,11 @@ def _apply_onboarding(user, data):
     )
     user.recommended_program = program_id or ''
 
-    if not user.training_days:
+    # Дни из анкеты главнее; без них — прежнее расписание или рекомендация.
+    chosen_days = data.get('training_days') or []
+    if chosen_days:
+        user.training_days = chosen_days
+    elif not user.training_days:
         user.training_days = recommend_training_days(user.level)
 
     user.onboarded_at = timezone.now()
@@ -326,7 +331,7 @@ class PlanPreviewView(APIView):
             'program_id': program_id,
             'reason': reason,
             'program': _serialize_program(program_id),
-            'training_days': recommend_training_days(data['level']),
+            'training_days': data.get('training_days') or recommend_training_days(data['level']),
         })
 
 

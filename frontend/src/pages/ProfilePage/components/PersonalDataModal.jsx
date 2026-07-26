@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react'
 import Modal from '../../../components/organisms/Modal/Modal'
 import './PersonalDataModal.scss'
 
-const GENDER_OPTIONS = ['Мужской', 'Женский', 'Другое']
+const GENDER_OPTIONS = ['Мужской', 'Женский']
 const GOAL_OPTIONS = ['Сушка', 'Набор массы', 'Поддержание', 'Выносливость', 'Рекомпозиция']
 
-const GENDER_FROM_API = { male: 'Мужской', female: 'Женский', other: 'Другое' }
+const GENDER_FROM_API = { male: 'Мужской', female: 'Женский' }
 const GOAL_FROM_API = { cut: 'Сушка', bulk: 'Набор массы', maintain: 'Поддержание', endurance: 'Выносливость', recomp: 'Рекомпозиция' }
 
 function toInputValue(value) {

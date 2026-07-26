@@ -3,6 +3,7 @@ import { AppUIProvider } from './context/AppUIContext'
 import AuthGate from './components/common/AuthGate'
 import MainLayout from './layouts/MainLayout'
 import FlowLayout from './layouts/FlowLayout'
+import LandingPage from './pages/LandingPage/LandingPage'
 import WelcomePage from './pages/AuthPages/WelcomePage'
 import LoginPage from './pages/AuthPages/LoginPage'
 import RegisterPage from './pages/AuthPages/RegisterPage'
@@ -27,6 +28,7 @@ function App() {
       <BrowserRouter>
         <AuthGate>
           <Routes>
+            <Route path="landing" element={<LandingPage />} />
             <Route path="welcome" element={<WelcomePage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />

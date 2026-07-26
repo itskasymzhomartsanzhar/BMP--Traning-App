@@ -1,7 +1,8 @@
-function GreetingCard({ userName }) {
+function GreetingCard({ userName, gender }) {
+  const ready = gender === 'female' ? 'Готова' : 'Готов'
   return (
     <div className="greeting card animate-in">
-      <p>Привет, {userName}! <br/>Готов к победам сегодня?</p>
+      <p>Привет, {userName}! <br/>{ready} к победам сегодня?</p>
     </div>
   )
 }

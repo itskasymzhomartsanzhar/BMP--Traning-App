@@ -24,7 +24,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     GENDER_CHOICES = [
         ('male', 'Мужской'),
         ('female', 'Женский'),
-        ('other', 'Другое'),
     ]
     GOAL_CHOICES = [
         ('cut', '   Сушка'),

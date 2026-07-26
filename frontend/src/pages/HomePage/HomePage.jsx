@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAppUI } from '../../context/AppUIContext'
 import { getDashboard } from '../../api/users'
 import GreetingCard from './components/GreetingCard'
+import YourGoalCard from './components/YourGoalCard'
 import GoalCard from './components/GoalCard'
 import HomeStatsGrid from './components/HomeStatsGrid'
 import TodayPlanCard from './components/TodayPlanCard'
@@ -52,7 +53,12 @@ function HomePage() {
 
   return (
     <section className="page page-home">
-      <GreetingCard userName={userName} />
+      <GreetingCard userName={userName} gender={userProfile?.gender} />
+      <YourGoalCard
+        profile={userProfile}
+        currentWeight={stats?.current_weight_kg}
+        onClick={() => navigate('/analytics')}
+      />
       <GoalCard
         goal={weeklyGoal}
         selectedDayId={selectedDay?.id ?? null}

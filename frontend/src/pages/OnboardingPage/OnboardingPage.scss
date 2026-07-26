@@ -191,6 +191,17 @@
   gap: 10px;
 }
 
+.onb__chips--days {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+
+  .onb-chip {
+    padding: 13px 0;
+    text-align: center;
+  }
+}
+
 .onb-chip {
   padding: 11px 18px;
   font-size: 15px;

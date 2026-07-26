@@ -50,6 +50,11 @@ class OnboardingSerializer(serializers.Serializer):
         required=False,
         allow_empty=True,
     )
+    training_days = serializers.ListField(
+        child=serializers.ChoiceField(choices=['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']),
+        required=False,
+        allow_empty=True,
+    )
 
     def validate_name(self, value):
         cleaned = value.strip()
