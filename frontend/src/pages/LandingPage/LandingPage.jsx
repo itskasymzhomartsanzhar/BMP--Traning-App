@@ -27,7 +27,6 @@ function LandingPage() {
         </button>
         <span className="landing__item landing__item--soon">
           SUPPS
-          <small>SOON</small>
         </span>
         <span className="landing__item landing__item--soon">
           SPORT WEAR
