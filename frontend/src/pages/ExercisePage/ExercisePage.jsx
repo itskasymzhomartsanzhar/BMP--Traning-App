@@ -64,7 +64,8 @@ function ExercisePage() {
         reps: originalExercise.reps,
         weight: originalExercise.weight,
         rest: originalExercise.rest,
-        videoUrl: tpl.video_url,
+        video_url: tpl.video_url,
+        video_embed: tpl.video_embed,
       },
     })
     setPickerOpen(false)
@@ -105,15 +106,32 @@ function ExercisePage() {
       </div>
 
       <div className="exercise-video card animate-in delay-1">
-        <video
-          className="exercise-video__player"
-          src={exercise.videoUrl}
-          controls
-          playsInline
-          poster=""
-        >
-          <track kind="captions" />
-        </video>
+        {exercise.video_embed ? (
+          // Kinescope: автозапуск без звука, по кругу. key — чтобы плеер
+          // пересоздавался при смене упражнения, а не продолжал старый ролик.
+          <iframe
+            key={exercise.id}
+            className="exercise-video__player"
+            src={`${exercise.video_embed}?autoplay=true&muted=true&loop=true&playsinline=true`}
+            title={exercise.name}
+            allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+            allowFullScreen
+          />
+        ) : (
+          <video
+            key={exercise.id}
+            className="exercise-video__player"
+            src={exercise.video_url || exercise.videoUrl}
+            autoPlay
+            muted
+            loop
+            controls
+            playsInline
+            poster=""
+          >
+            <track kind="captions" />
+          </video>
+        )}
       </div>
 
       <button

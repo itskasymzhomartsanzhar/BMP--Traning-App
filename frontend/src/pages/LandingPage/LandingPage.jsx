@@ -1,6 +1,6 @@
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useAppUI } from '../../context/AppUIContext'
-import personImg from '../../assets/person.png'
+import personImg from '../../assets/person.webp'
 import logoImg from '../../assets/logo-mark.png'
 import './LandingPage.scss'
 
@@ -17,7 +17,7 @@ function LandingPage() {
 
       <div className="landing__hero">
         <h1 className="landing__brand" aria-label="TRES">TRES</h1>
-        <img className="landing__person" src={personImg} alt="" />
+        <img className="landing__person" src={personImg} alt="" fetchPriority="high" decoding="async" />
         <p className="landing__eco">FITNESS ECOSYSTEM</p>
       </div>
 

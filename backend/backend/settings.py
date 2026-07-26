@@ -132,6 +132,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default='')
 TELEGRAM_DEV_MODE = config('TELEGRAM_DEV_MODE', default=False, cast=bool)
 
+# Kinescope — видеохостинг для роликов упражнений (загрузка из админки).
+KINESCOPE_API_TOKEN = config('KINESCOPE_API_TOKEN', default='')
+KINESCOPE_PARENT_ID = config('KINESCOPE_PARENT_ID', default='')
+
 YOOKASSA_SHOP_ID = config('YOOKASSA_SHOP_ID', default='')
 YOOKASSA_SECRET_KEY = config('YOOKASSA_SECRET_KEY', default='')
 

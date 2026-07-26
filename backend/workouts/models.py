@@ -25,6 +25,12 @@ class ExerciseTemplate(models.Model):
     # а не ключи. Переход на choices требует миграции данных и правок на фронте.
     muscle = models.CharField('Группа мышц', max_length=100)
     video_url = models.URLField('Ссылка на видео', blank=True)
+    kinescope_id = models.CharField(
+        'Kinescope ID',
+        max_length=64,
+        blank=True,
+        help_text='Заполняется автоматически при загрузке видео. Можно вписать ID готового ролика вручную.',
+    )
 
     class Meta:
         verbose_name = 'Упражнение'
@@ -33,6 +39,13 @@ class ExerciseTemplate(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def video_embed(self):
+        """Ссылка для встраивания плеера Kinescope; пусто, если видео не загружено."""
+        if self.kinescope_id:
+            return f'https://kinescope.io/embed/{self.kinescope_id}'
+        return ''
 
 
 class WorkoutProgram(models.Model):

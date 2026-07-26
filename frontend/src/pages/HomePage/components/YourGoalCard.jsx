@@ -59,15 +59,11 @@ function YourGoalCard({ profile, currentWeight, onClick }) {
     <button type="button" className="your-goal card animate-in delay-1" onClick={onClick}>
       <div className="your-goal__head">
         <h2>Твоя цель</h2>
-        <span className="your-goal__badge">реалистично</span>
       </div>
-      <p className="your-goal__subtitle">
-        Маршрут по анкете: цель, темп, тренировки и питание в одной логике.
-      </p>
+
 
       <div className="your-goal__body">
         <div className="your-goal__figure">
-          <span className="your-goal__level">Lv. {level}</span>
           <img src={figure} alt="" aria-hidden="true" />
         </div>
 

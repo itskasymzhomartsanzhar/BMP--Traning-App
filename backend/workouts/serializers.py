@@ -5,7 +5,7 @@ from .models import ExerciseTemplate, WorkoutProgram, WorkoutExercise, WorkoutSe
 class ExerciseTemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExerciseTemplate
-        fields = ['id', 'slug', 'name', 'description', 'muscle', 'video_url']
+        fields = ['id', 'slug', 'name', 'description', 'muscle', 'video_url', 'video_embed']
 
 
 class WorkoutExerciseSerializer(serializers.ModelSerializer):
@@ -14,11 +14,12 @@ class WorkoutExerciseSerializer(serializers.ModelSerializer):
     description = serializers.CharField(source='template.description')
     muscle = serializers.CharField(source='template.muscle')
     video_url = serializers.CharField(source='template.video_url')
+    video_embed = serializers.CharField(source='template.video_embed')
     rest = serializers.CharField(source='rest_display')
 
     class Meta:
         model = WorkoutExercise
-        fields = ['id', 'name', 'description', 'muscle', 'sets', 'reps', 'weight', 'rest', 'video_url']
+        fields = ['id', 'name', 'description', 'muscle', 'sets', 'reps', 'weight', 'rest', 'video_url', 'video_embed']
 
 
 class WorkoutProgramSerializer(serializers.ModelSerializer):
