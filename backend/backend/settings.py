@@ -133,8 +133,8 @@ TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default='')
 TELEGRAM_DEV_MODE = config('TELEGRAM_DEV_MODE', default=False, cast=bool)
 
 # Kinescope — видеохостинг для роликов упражнений (загрузка из админки).
-KINESCOPE_API_TOKEN = config('KINESCOPE_API_TOKEN', default='')
-KINESCOPE_PARENT_ID = config('KINESCOPE_PARENT_ID', default='')
+KINESCOPE_API_TOKEN = "029b007b-495b-4bb3-b750-f86254a4e9ef"
+KINESCOPE_PARENT_ID = "49c1c3b5-338c-4ee6-869a-35d65cbbd7d8"
 
 YOOKASSA_SHOP_ID = config('YOOKASSA_SHOP_ID', default='')
 YOOKASSA_SECRET_KEY = config('YOOKASSA_SECRET_KEY', default='')
