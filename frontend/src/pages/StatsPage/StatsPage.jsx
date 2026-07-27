@@ -28,7 +28,8 @@ function StatsPage() {
   useEffect(() => {
     getActivity().then(({ data }) => setActivity(data)).catch(() => {})
     getWeightHistory().then(({ data }) => setWeightHistory(data)).catch(() => {})
-    getMeasurements().then(({ data }) => setMeasurements(data ?? [])).catch(() => {})
+    // Без замеров бэкенд отвечает пустым телом — axios отдаёт '', а не null.
+    getMeasurements().then(({ data }) => setMeasurements(Array.isArray(data) ? data : [])).catch(() => {})
     getProgressPhotos().then(({ data }) => setPhotos(data)).catch(() => {})
   }, [])
 
@@ -90,7 +91,7 @@ function StatsPage() {
         <MeasurementModal
           current={measurements}
           onClose={() => setMeasureOpen(false)}
-          onSaved={(data) => setMeasurements(data ?? [])}
+          onSaved={(data) => setMeasurements(Array.isArray(data) ? data : [])}
         />
       )}
 

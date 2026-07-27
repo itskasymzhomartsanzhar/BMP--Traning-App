@@ -7,6 +7,29 @@ import { useAppUI } from '../../context/AppUIContext'
 import { getWorkout, getExercises } from '../../api/workouts'
 import './ExercisePage.scss'
 
+// background=true: плеер без контролов, прогресс-бара и кнопки звука —
+// чистый зацикленный ролик без звука, как фоновое видео.
+const KINESCOPE_PARAMS = 'background=true&autoplay=true&muted=true&loop=true&playsinline=true&controls=false'
+
+function ExerciseVideo({ ex, hidden }) {
+  const cls = `exercise-video__player${hidden ? ' exercise-video__player--preload' : ''}`
+  if (ex.video_embed) {
+    return (
+      <iframe
+        className={cls}
+        src={`${ex.video_embed}?${KINESCOPE_PARAMS}`}
+        title={ex.name}
+        allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+      />
+    )
+  }
+  return (
+    <video className={cls} src={ex.video_url || ex.videoUrl} autoPlay muted loop playsInline preload="auto">
+      <track kind="captions" />
+    </video>
+  )
+}
+
 function ExercisePage() {
   const { programId, index } = useParams()
   const location = useLocation()
@@ -49,6 +72,8 @@ function ExercisePage() {
   }
 
   const exercise = swappedExercise?.index === currentIndex ? swappedExercise.exercise : originalExercise
+  // Следующее упражнение — его видео предзагружается в скрытом плеере.
+  const nextExercise = workout.exercises[currentIndex + 1] ?? null
 
   const handleSwap = (templateSlug) => {
     const tpl = exerciseTemplates.find((t) => t.slug === templateSlug)
@@ -106,31 +131,14 @@ function ExercisePage() {
       </div>
 
       <div className="exercise-video card animate-in delay-1">
-        {exercise.video_embed ? (
-          // Kinescope: автозапуск без звука, по кругу. key — чтобы плеер
-          // пересоздавался при смене упражнения, а не продолжал старый ролик.
-          <iframe
-            key={exercise.id}
-            className="exercise-video__player"
-            src={`${exercise.video_embed}?autoplay=true&muted=true&loop=true&playsinline=true`}
-            title={exercise.name}
-            allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-            allowFullScreen
-          />
-        ) : (
-          <video
-            key={exercise.id}
-            className="exercise-video__player"
-            src={exercise.video_url || exercise.videoUrl}
-            autoPlay
-            muted
-            loop
-            controls
-            playsInline
-            poster=""
-          >
-            <track kind="captions" />
-          </video>
+        {/*
+          Текущее видео + скрытый предзагруженный плеер следующего упражнения.
+          Ключ — id упражнения: при переходе React переиспользует уже
+          играющий iframe, и ролик показывается мгновенно, без загрузки.
+        */}
+        <ExerciseVideo key={exercise.id} ex={exercise} hidden={false} />
+        {nextExercise && (nextExercise.video_embed || nextExercise.video_url) && (
+          <ExerciseVideo key={nextExercise.id} ex={nextExercise} hidden />
         )}
       </div>
 

@@ -12,9 +12,10 @@ const FIELDS = [
 ]
 
 function initialValues(current) {
+  const list = Array.isArray(current) ? current : []
   const values = {}
   FIELDS.forEach(({ field }) => {
-    const found = current.find((m) => m.field === field)
+    const found = list.find((m) => m.field === field)
     const num = found ? parseFloat(String(found.value).replace(',', '.')) : NaN
     values[field] = Number.isFinite(num) ? String(num) : ''
   })

@@ -127,7 +127,9 @@ class MeasurementsView(APIView):
         from analytics.models import BodyMeasurement
         latest = BodyMeasurement.objects.filter(user=request.user).order_by('-recorded_at', '-id').first()
         if not latest:
-            return Response(None)
+            # Пустой список, а не None: DRF рендерит None пустым телом,
+            # и axios на фронте получает '' вместо массива.
+            return Response([])
         return Response(_measurement_to_dict(latest))
 
     def post(self, request):

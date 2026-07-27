@@ -14,6 +14,7 @@
 }
 
 .exercise-video {
+  position: relative; // якорь для скрытого предзагружаемого плеера
   padding: 0;
   overflow: hidden;
 }
@@ -25,6 +26,15 @@
   object-fit: cover;
   background: #0f0f0f;
   border: 0; // iframe Kinescope без рамки
+  pointer-events: none; // фоновый ролик: клики не открывают плеер
+}
+
+// Плеер следующего упражнения: уже грузится и играет, но не виден.
+.exercise-video__player--preload {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  visibility: hidden;
 }
 
 .exercise-muscle {
