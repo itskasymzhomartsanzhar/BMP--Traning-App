@@ -31,6 +31,7 @@ function OnboardingPage() {
   return (
     <OnboardingWizard
       initialName={userProfile?.first_name || userProfile?.display_name || ''}
+      askAccount={!userProfile?.email}
       onSubmit={(payload, form) =>
         submitOnboarding(payload).then(({ data }) => {
           completeOnboarding(data.user)

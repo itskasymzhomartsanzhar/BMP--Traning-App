@@ -17,6 +17,8 @@ const INITIAL_FORM = {
   place: '',
   injuries: [],
   trainingDays: [],
+  email: '',
+  password: '',
 }
 
 function extractApiError(error) {
@@ -33,14 +35,14 @@ function extractApiError(error) {
  * возвращает промис — авторизованный флоу шлёт анкету в профиль,
  * гостевой — на превью плана.
  */
-function OnboardingWizard({ initialName = '', onSubmit, onBackFromFirst, submitLabel = 'Подобрать план' }) {
+function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBackFromFirst, submitLabel = 'Подобрать план' }) {
   const [stepIndex, setStepIndex] = useState(0)
   const [form, setForm] = useState(() => ({ ...INITIAL_FORM, name: initialName }))
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
 
   // «Своя программа» укорачивает опрос до пяти шагов.
-  const steps = stepsForForm(form)
+  const steps = stepsForForm(form, askAccount)
   const custom = isCustomProgram(form)
   const step = steps[stepIndex]
   const progress = ((stepIndex + 1) / steps.length) * 100
@@ -307,6 +309,40 @@ function OnboardingWizard({ initialName = '', onSubmit, onBackFromFirst, submitL
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {step === 'account' && (
+          <div className="onb__step">
+            <h1 className="onb__title">Данные для входа</h1>
+            <p className="onb__subtitle">Почта и пароль — чтобы входить в аккаунт и без Telegram.</p>
+            <label className="onb__field">
+              Почта
+              <input
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                value={form.email}
+                onChange={(e) => setField('email', e.target.value)}
+                aria-invalid={Boolean(errors.email)}
+              />
+              {errors.email && <span className="onb__error">{errors.email}</span>}
+            </label>
+            <label className="onb__field">
+              Пароль
+              <input
+                type="password"
+                autoComplete="new-password"
+                placeholder="Минимум 8 символов"
+                value={form.password}
+                onChange={(e) => setField('password', e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && goNext()}
+                aria-invalid={Boolean(errors.password)}
+              />
+              {errors.password && <span className="onb__error">{errors.password}</span>}
+            </label>
+            {errors.submit && <span className="onb__error">{errors.submit}</span>}
           </div>
         )}
 

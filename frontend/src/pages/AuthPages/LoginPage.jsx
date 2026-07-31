@@ -84,8 +84,13 @@ function LoginPage() {
                 <div className="auth-divider">или</div>
                 <TelegramLoginButton
                   onAuth={(user) =>
-                    loginWithTelegramWidget(user).catch(() => showToast('Не удалось войти через Telegram'))
+                    loginWithTelegramWidget(user).catch((err) =>
+                      showToast(err.response?.data?.detail || 'Не удалось войти через Telegram'))
                   }
+                  onError={(err) => {
+                    if (['Telegram login was cancelled', 'popup_closed'].includes(String(err?.message))) return
+                    showToast('Вход через Telegram не завершился. Попробуйте ещё раз.')
+                  }}
                 />
               </>
             )}

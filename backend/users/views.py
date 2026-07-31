@@ -1,3 +1,4 @@
+import logging
 from datetime import date, timedelta
 
 from django.conf import settings
@@ -12,9 +13,12 @@ from .auth import WebAppAuth, LoginWidgetAuth, TelegramLoginOidcAuth, AuthError
 from .models import User
 from .recommendation import recommend_program, recommend_training_days
 from .serializers import (
-    UserSerializer, UserUpdateSerializer, OnboardingSerializer,
+    UserSerializer, UserUpdateSerializer, OnboardingSerializer, AuthedOnboardingSerializer,
     EmailRegisterSerializer, EmailLoginSerializer,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 def _get_tokens(user):
@@ -306,10 +310,27 @@ class OnboardingView(APIView):
         })
 
     def post(self, request):
-        serializer = OnboardingSerializer(data=request.data)
+        serializer = AuthedOnboardingSerializer(data=request.data, context={'user': request.user})
         serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
 
-        recommendation = _apply_onboarding(request.user, serializer.validated_data)
+        recommendation = _apply_onboarding(request.user, data)
+
+        # Учётные данные задаются только один раз — при первичной анкете
+        # Telegram-аккаунта; менять их здесь у email-аккаунтов нельзя.
+        user = request.user
+        update_fields = []
+        email = data.get('email') or ''
+        if email and not user.email:
+            user.email = email
+            update_fields.append('email')
+        password = data.get('password') or ''
+        if password and not user.has_usable_password():
+            user.set_password(password)
+            update_fields.append('password')
+        if update_fields:
+            user.save(update_fields=update_fields)
+
         return Response({
             'user': UserSerializer(request.user).data,
             'recommendation': recommendation,
@@ -436,8 +457,10 @@ class TelegramWidgetAuthView(APIView):
         try:
             user_data = _telegram_widget_user_data(request.data)
         except AuthError as err:
+            logger.warning('Telegram widget auth failed: %s', err.detail)
             return Response({'detail': 'Не удалось подтвердить данные Telegram.'}, status=err.status)
-        except (KeyError, ValueError):
+        except (KeyError, ValueError) as err:
+            logger.warning('Telegram widget auth failed: %s', err)
             return Response({'detail': 'Не удалось подтвердить данные Telegram.'}, status=status.HTTP_403_FORBIDDEN)
 
         user, created = User.objects.get_or_create(

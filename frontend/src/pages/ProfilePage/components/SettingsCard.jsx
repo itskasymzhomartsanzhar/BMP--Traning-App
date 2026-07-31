@@ -73,7 +73,13 @@ function SettingsCard() {
           onClose={() => setTgModalOpen(false)}
           actions={[{ label: 'Отмена', variant: 'secondary', onClick: () => {} }]}
         >
-          <TelegramLoginButton onAuth={onTelegramAuth} />
+          <TelegramLoginButton
+            onAuth={onTelegramAuth}
+            onError={(err) => {
+              if (['Telegram login was cancelled', 'popup_closed'].includes(String(err?.message))) return
+              showToast('Подключение Telegram не завершилось. Попробуйте ещё раз.')
+            }}
+          />
         </Modal>
       )}
     </div>

@@ -54,13 +54,16 @@ export const DAYS_BY_LEVEL = {
 export const sortDays = (days) => [...days].sort((a, b) => DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b))
 
 export const STEPS = ['name', 'birth', 'body', 'goal', 'level', 'injuries', 'days']
+export const ACCOUNT_STEP = 'account'
 
 // «Своя программа» — опрос заканчивается на пятом шаге: травмы и дни
 // не нужны, человек сам соберёт расписание в приложении.
 export const isCustomProgram = (form) => form.level === 'custom'
 
-export const stepsForForm = (form) =>
-  isCustomProgram(form) ? STEPS.slice(0, STEPS.indexOf('level') + 1) : STEPS
+export const stepsForForm = (form, askAccount = false) => {
+  const base = isCustomProgram(form) ? STEPS.slice(0, STEPS.indexOf('level') + 1) : STEPS
+  return askAccount ? [...base, ACCOUNT_STEP] : base
+}
 
 export function calcAge(birthDate) {
   if (!birthDate) return null
@@ -110,6 +113,14 @@ export function validateStep(step, form) {
     errors.days = 'Выберите хотя бы один день'
   }
 
+  if (step === ACCOUNT_STEP) {
+    const email = form.email.trim()
+    if (!email) errors.email = 'Укажите почту'
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = 'Некорректная почта'
+    if (!form.password) errors.password = 'Придумайте пароль'
+    else if (form.password.length < 8) errors.password = 'Минимум 8 символов'
+  }
+
   return errors
 }
 
@@ -119,7 +130,12 @@ export function buildPayload(form) {
     ? []
     : form.injuries
 
+  const account = form.email?.trim()
+    ? { email: form.email.trim().toLowerCase(), password: form.password }
+    : {}
+
   return {
+    ...account,
     name: form.name.trim(),
     birth_date: form.birthDate,
     gender: form.gender,

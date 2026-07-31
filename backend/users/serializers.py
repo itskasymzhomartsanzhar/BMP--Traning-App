@@ -118,6 +118,24 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         return value
 
 
+class AuthedOnboardingSerializer(OnboardingSerializer):
+    """Анкета авторизованного пользователя; Telegram-аккаунт заодно задаёт почту и пароль."""
+    email = serializers.EmailField(required=False, allow_blank=True)
+    password = serializers.CharField(min_length=8, max_length=128, write_only=True, required=False, allow_blank=True)
+
+    def validate_email(self, value):
+        email = value.strip().lower()
+        if not email:
+            return ''
+        user = self.context.get('user')
+        queryset = User.objects.filter(email__iexact=email).exclude(email='')
+        if user is not None and user.pk:
+            queryset = queryset.exclude(pk=user.pk)
+        if queryset.exists():
+            raise serializers.ValidationError('Эта почта уже зарегистрирована. Попробуйте войти.')
+        return email
+
+
 class EmailRegisterSerializer(OnboardingSerializer):
     """Анкета + учётные данные: гость проходит опрос до создания аккаунта."""
     email = serializers.EmailField()

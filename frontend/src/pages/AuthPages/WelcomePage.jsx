@@ -11,9 +11,14 @@ function WelcomePage() {
   if (isAuthenticated) return <Navigate to="/" replace />
 
   const handleTelegramAuth = (widgetUser) => {
-    loginWithTelegramWidget(widgetUser).catch(() =>
-      showToast('Не удалось войти через Telegram'),
+    loginWithTelegramWidget(widgetUser).catch((err) =>
+      showToast(err.response?.data?.detail || 'Не удалось войти через Telegram'),
     )
+  }
+
+  const handleTelegramError = (error) => {
+    if (['Telegram login was cancelled', 'popup_closed'].includes(String(error?.message))) return
+    showToast('Вход через Telegram не завершился. Попробуйте ещё раз.')
   }
 
   return (
@@ -60,7 +65,7 @@ function WelcomePage() {
           {telegramWidgetConfigured && (
             <>
               <div className="auth-divider">или</div>
-              <TelegramLoginButton onAuth={handleTelegramAuth} />
+              <TelegramLoginButton onAuth={handleTelegramAuth} onError={handleTelegramError} />
             </>
           )}
 
