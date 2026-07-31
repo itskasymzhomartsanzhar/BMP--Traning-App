@@ -34,6 +34,11 @@ function OnboardingPage() {
       onSubmit={(payload, form) =>
         submitOnboarding(payload).then(({ data }) => {
           completeOnboarding(data.user)
+          // «Своя программа» — без экрана плана, сразу в приложение.
+          if (payload.level === 'custom') {
+            navigate('/', { replace: true })
+            return
+          }
           setUserName(form.name.trim())
           setResult(data.recommendation)
         })

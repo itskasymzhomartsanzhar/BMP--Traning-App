@@ -15,6 +15,7 @@ export const LEVEL_OPTIONS = [
   { id: 'beginner', label: 'Новичок', hint: 'Мало опыта или большой перерыв' },
   { id: 'intermediate', label: 'Средний', hint: 'Тренируюсь регулярно' },
   { id: 'advanced', label: 'Продвинутый', hint: 'Стаж больше двух лет' },
+  { id: 'custom', label: 'Своя программа', hint: 'Сам выбираю упражнения и дни' },
 ]
 
 export const PLACE_OPTIONS = [
@@ -53,6 +54,13 @@ export const DAYS_BY_LEVEL = {
 export const sortDays = (days) => [...days].sort((a, b) => DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b))
 
 export const STEPS = ['name', 'birth', 'body', 'goal', 'level', 'injuries', 'days']
+
+// «Своя программа» — опрос заканчивается на пятом шаге: травмы и дни
+// не нужны, человек сам соберёт расписание в приложении.
+export const isCustomProgram = (form) => form.level === 'custom'
+
+export const stepsForForm = (form) =>
+  isCustomProgram(form) ? STEPS.slice(0, STEPS.indexOf('level') + 1) : STEPS
 
 export function calcAge(birthDate) {
   if (!birthDate) return null
@@ -94,7 +102,8 @@ export function validateStep(step, form) {
   if (step === 'goal' && !form.goal) errors.goal = 'Выберите цель'
   if (step === 'level') {
     if (!form.level) errors.level = 'Выберите уровень'
-    if (!form.place) errors.place = 'Выберите, где будете тренироваться'
+    // При «своей программе» место тренировок не спрашиваем.
+    if (!isCustomProgram(form) && !form.place) errors.place = 'Выберите, где будете тренироваться'
   }
 
   if (step === 'days' && form.trainingDays.length === 0) {
@@ -105,7 +114,8 @@ export function validateStep(step, form) {
 }
 
 export function buildPayload(form) {
-  const injuries = form.injuries.includes('none')
+  const custom = isCustomProgram(form)
+  const injuries = custom || form.injuries.includes('none')
     ? []
     : form.injuries
 
@@ -117,8 +127,8 @@ export function buildPayload(form) {
     weight: Number(Number(String(form.weight).replace(',', '.')).toFixed(1)),
     goal: form.goal,
     level: form.level,
-    place: form.place,
+    place: custom ? '' : form.place,
     injuries,
-    training_days: sortDays(form.trainingDays),
+    training_days: custom ? [] : sortDays(form.trainingDays),
   }
 }

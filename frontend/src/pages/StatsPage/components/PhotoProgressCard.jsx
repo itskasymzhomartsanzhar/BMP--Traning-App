@@ -1,3 +1,4 @@
+import { useAppUI } from '../../../context/AppUIContext'
 import { useState } from 'react'
 import { FaCamera } from 'react-icons/fa6'
 
@@ -6,6 +7,7 @@ import { FaCamera } from 'react-icons/fa6'
  * плавно «переливает» один кадр в другой — изменения тела видны наглядно.
  */
 function PhotoProgressCard({ photos, onAdd }) {
+  const { t } = useAppUI()
   const [position, setPosition] = useState(0)
 
   const count = photos.length
@@ -13,12 +15,10 @@ function PhotoProgressCard({ photos, onAdd }) {
 
   return (
     <div className="card photo-card animate-in delay-2">
-      <h2>Фото прогресса</h2>
+      <h2>{t('stats.photoProgress')}</h2>
 
       {count === 0 && (
-        <p className="photo-card__empty">
-          Сделайте первое фото по сетке — и со временем здесь появится ваша динамика.
-        </p>
+        <p className="photo-card__empty">{t('stats.photoEmpty')}</p>
       )}
 
       {count > 0 && (
@@ -58,7 +58,7 @@ function PhotoProgressCard({ photos, onAdd }) {
       )}
 
       <button type="button" className="primary photo-card__add" onClick={onAdd}>
-        <FaCamera aria-hidden="true" /> Добавить фото
+        <FaCamera aria-hidden="true" /> {t('stats.addPhoto')}
       </button>
     </div>
   )

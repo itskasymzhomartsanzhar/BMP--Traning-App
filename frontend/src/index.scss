@@ -27,3 +27,16 @@ body {
   border-inline: 1px solid #2c2c2c;
   position: relative;
 }
+
+/* Числовые инпуты без стрелок-спиннеров — по всему приложению */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

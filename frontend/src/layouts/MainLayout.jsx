@@ -9,7 +9,7 @@ import { getStreak } from '../api/analytics'
 function MainLayout() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { showInfo, showPremium, authReady } = useAppUI()
+  const { showInfo, showPremium, authReady, t } = useAppUI()
   const [streak, setStreak] = useState(0)
 
   useEffect(() => {
@@ -41,7 +41,7 @@ function MainLayout() {
       </main>
 
       <BottomNav
-        items={NAV_ITEMS}
+        items={NAV_ITEMS.map((item) => ({ ...item, label: t(`nav.${item.key}`) }))}
         activePage={resolvedActive}
         onChange={(item) => {
           const path = item.key === 'home' ? '/' : `/${item.key}`

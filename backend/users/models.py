@@ -36,6 +36,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         ('beginner', 'Новичок'),
         ('intermediate', 'Средний'),
         ('advanced', 'Продвинутый'),
+        # Без подбора: человек сам выбирает упражнения и дни в приложении.
+        ('custom', 'Своя программа'),
     ]
     PLACE_CHOICES = [
         ('gym', 'В зале'),
@@ -73,6 +75,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     push_notifications = models.BooleanField('Push-уведомления', default=True)
     email_newsletter = models.BooleanField('Email-рассылка', default=False)
+    language = models.CharField(
+        'Язык', max_length=5,
+        choices=[('ru', 'Русский'), ('en', 'English')], default='ru',
+    )
+    units = models.CharField(
+        'Система измерения', max_length=10,
+        choices=[('metric', 'Метрическая (кг · см)'), ('imperial', 'Имперская (lb · in)')], default='metric',
+    )
 
     workout_count = models.PositiveIntegerField('Всего тренировок', default=0)
     training_days = models.JSONField('Дни тренировок', default=list)
@@ -122,3 +132,4 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def is_onboarded(self):
         return self.onboarded_at is not None
+

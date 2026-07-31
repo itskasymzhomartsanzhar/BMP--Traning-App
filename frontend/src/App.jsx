@@ -19,7 +19,6 @@ import WorkoutSessionPage from './pages/WorkoutSessionPage/WorkoutSessionPage'
 import ExercisePage from './pages/ExercisePage/ExercisePage'
 import WorkoutCompletePage from './pages/WorkoutCompletePage/WorkoutCompletePage'
 import ArticlePage from './pages/ArticlePage/ArticlePage'
-import RecipePage from './pages/RecipePage/RecipePage'
 import './styles/app-shell.scss'
 
 function App() {
@@ -49,7 +48,6 @@ function App() {
               <Route path="trainings/:programId/exercise/:index" element={<ExercisePage />} />
               <Route path="trainings/:programId/complete" element={<WorkoutCompletePage />} />
               <Route path="article/:articleId" element={<ArticlePage />} />
-              <Route path="recipe/:recipeId" element={<RecipePage />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

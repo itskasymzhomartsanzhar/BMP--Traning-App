@@ -13,7 +13,7 @@ const DEFAULT_WORKOUT_ID = 'gym-fullbody'
 
 function HomePage() {
   const navigate = useNavigate()
-  const { showInfo, showTrainingDays, userProfile, authReady } = useAppUI()
+  const { showInfo, showTrainingDays, userProfile, authReady, t } = useAppUI()
   const [dashboard, setDashboard] = useState(null)
   const [selectedDayId, setSelectedDayId] = useState(null)
 
@@ -31,10 +31,11 @@ function HomePage() {
   }
 
   const stats = dashboard?.stats
+  const kg = t('stats.kg')
   const homeStats = [
-    { label: 'Вес', value: stats?.current_weight ?? (userProfile?.weight ? `${userProfile.weight} кг` : '—') },
-    { label: 'Тренировок', value: String(stats?.total_workouts ?? userProfile?.workout_count ?? 0) },
-    { label: 'Активность', value: stats?.activity_days ? `${stats.activity_days} дн` : '0 дн' },
+    { id: 'weight', label: t('home.statWeight'), value: stats?.current_weight_kg ? `${stats.current_weight_kg} ${kg}` : (userProfile?.weight ? `${userProfile.weight} ${kg}` : '—') },
+    { id: 'workouts', label: t('home.statWorkouts'), value: String(stats?.total_workouts ?? userProfile?.workout_count ?? 0) },
+    { id: 'activity', label: t('home.statActivity'), value: `${stats?.activity_days ?? 0} ${t('home.daysSuffix')}` },
   ]
 
   const days = weeklyGoal.days ?? []
@@ -48,8 +49,8 @@ function HomePage() {
   const userName = userProfile?.name || userProfile?.display_name || userProfile?.first_name || 'друг'
 
   const planTitle = !selectedDay || selectedDay.is_today
-    ? 'План на сегодня'
-    : `План · ${selectedDay.label} ${selectedDay.date}`
+    ? t('home.planToday')
+    : `${t('home.planFor')} · ${selectedDay.label} ${selectedDay.date}`
 
   return (
     <section className="page page-home">
@@ -68,16 +69,16 @@ function HomePage() {
       <HomeStatsGrid
         stats={homeStats}
         onStatClick={(item) => {
-          if (item.label === 'Вес') navigate('/analytics')
-          else if (item.label === 'Тренировок') navigate('/trainings')
-          else showInfo(item.label, `${item.value}\nДанные обновляются после каждой тренировки.`)
+          if (item.id === 'weight') navigate('/analytics')
+          else if (item.id === 'workouts') navigate('/trainings')
+          else showInfo(item.label, item.value)
         }}
       />
       <TodayPlanCard
         title={planTitle}
         items={selectedPlan}
         showStart={isTodaySelected}
-        emptyText={isTodaySelected ? 'На сегодня планов нет' : 'В этот день тренировок нет'}
+        emptyText={isTodaySelected ? t('home.noPlansToday') : t('home.restDay')}
         onStart={() => navigate(`/trainings/${DEFAULT_WORKOUT_ID}`)}
         onItemClick={(item) => {
           if (item.title === 'Питание') navigate('/nutrition')

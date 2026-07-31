@@ -1,9 +1,11 @@
 import Icon from '../../../components/common/Icon'
+import { useAppUI } from '../../../context/AppUIContext'
 
-function TodayPlanCard({ title = 'План на сегодня', items, showStart = true, emptyText = 'Планов нет', onStart, onItemClick }) {
+function TodayPlanCard({ title, items, showStart = true, emptyText, onStart, onItemClick }) {
+  const { t } = useAppUI()
   return (
     <div className="plan card animate-in delay-3">
-      <h2>{title}</h2>
+      <h2>{title ?? t('home.planToday')}</h2>
       {items.length > 0 ? (
         <ul>
           {items.map((item) => (
@@ -21,11 +23,11 @@ function TodayPlanCard({ title = 'План на сегодня', items, showStar
           ))}
         </ul>
       ) : (
-        <p className="plan__empty">{emptyText}</p>
+        <p className="plan__empty">{emptyText ?? t('home.noPlansToday')}</p>
       )}
       {showStart && (
         <button type="button" className="primary" onClick={onStart}>
-          Начать тренировку
+          {t('home.startWorkout')}
         </button>
       )}
     </div>

@@ -33,14 +33,22 @@ function RegisterPage() {
     return (
       <OnboardingWizard
         onBackFromFirst={() => navigate('/welcome')}
-        onSubmit={(payload, form) =>
-          planPreview(payload).then(({ data }) => {
+        onSubmit={(payload, form) => {
+          // «Своя программа»: опрос закончен — сразу к созданию аккаунта.
+          if (payload.level === 'custom') {
+            setAnketa(payload)
+            setUserName(form.name.trim())
+            setRecommendation(null)
+            setPhase('account')
+            return Promise.resolve()
+          }
+          return planPreview(payload).then(({ data }) => {
             setAnketa(payload)
             setUserName(form.name.trim())
             setRecommendation(data)
             setPhase('plan')
           })
-        }
+        }}
       />
     )
   }
@@ -96,7 +104,7 @@ function RegisterPage() {
       <div className="auth-page__content">
         <form className="auth-form" onSubmit={submit} noValidate>
           <div className="auth-form__head">
-            <button type="button" className="auth-form__back" onClick={() => setPhase('plan')} aria-label="Назад">
+            <button type="button" className="auth-form__back" onClick={() => setPhase(recommendation ? 'plan' : 'quiz')} aria-label="Назад">
               <FaArrowLeft />
             </button>
           </div>

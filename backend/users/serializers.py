@@ -18,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
             'email', 'avatar_url', 'gender', 'gender_display', 'weight', 'height',
             'goal', 'goal_display', 'birth_date', 'age', 'level', 'place', 'injuries',
             'is_onboarded', 'onboarded_at', 'recommended_program',
-            'push_notifications', 'email_newsletter',
+            'push_notifications', 'email_newsletter', 'language', 'units',
             'workout_count', 'training_days', 'created_at',
         ]
         read_only_fields = [
@@ -44,7 +44,10 @@ class OnboardingSerializer(serializers.Serializer):
     weight = serializers.FloatField(min_value=20, max_value=300)
     goal = serializers.ChoiceField(choices=[c[0] for c in User.GOAL_CHOICES])
     level = serializers.ChoiceField(choices=[c[0] for c in User.LEVEL_CHOICES])
-    place = serializers.ChoiceField(choices=[c[0] for c in User.PLACE_CHOICES])
+    # Необязательное: при уровне «Своя программа» место не спрашивается.
+    place = serializers.ChoiceField(
+        choices=[c[0] for c in User.PLACE_CHOICES], required=False, allow_blank=True,
+    )
     injuries = serializers.ListField(
         child=serializers.ChoiceField(choices=[c[0] for c in User.INJURY_CHOICES]),
         required=False,
@@ -79,13 +82,18 @@ class OnboardingSerializer(serializers.Serializer):
             return [i for i in value if i != 'none']
         return value
 
+    def validate(self, data):
+        if data.get('level') != 'custom' and not data.get('place'):
+            raise serializers.ValidationError({'place': 'Выберите, где будете тренироваться.'})
+        return data
+
 
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['display_name', 'email', 'gender', 'birth_date', 'weight', 'height', 'goal',
                   'level', 'place', 'injuries',
-                  'push_notifications', 'email_newsletter', 'training_days']
+                  'push_notifications', 'email_newsletter', 'language', 'units', 'training_days']
 
     def validate_weight(self, value):
         if value is not None and not (20 <= value <= 300):

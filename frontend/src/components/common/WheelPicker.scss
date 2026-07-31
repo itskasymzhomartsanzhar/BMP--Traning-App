@@ -1,0 +1,80 @@
+// Высота пункта синхронизирована с ITEM_HEIGHT в WheelPicker.jsx
+$wheel-item: 40px;
+
+.wheel {
+  position: relative;
+  height: $wheel-item * 3;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+
+  // Затухание сверху и снизу — как у барабана будильника.
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: $wheel-item;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  &::before {
+    top: 0;
+    background: linear-gradient(180deg, var(--bg-surface), transparent);
+  }
+
+  &::after {
+    bottom: 0;
+    background: linear-gradient(0deg, var(--bg-surface), transparent);
+  }
+}
+
+.wheel__highlight {
+  position: absolute;
+  top: $wheel-item;
+  left: 8px;
+  right: 8px;
+  height: $wheel-item;
+  border-radius: 10px;
+  background: rgba(232, 201, 143, 0.09);
+  border: 1px solid rgba(232, 201, 143, 0.35);
+  pointer-events: none;
+}
+
+.wheel__list {
+  height: 100%;
+  padding: $wheel-item 0; // чтобы первый и последний пункт вставали по центру
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.wheel__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: $wheel-item;
+  scroll-snap-align: center;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s ease, opacity 0.15s ease;
+  opacity: 0.55;
+
+  &.is-active {
+    color: var(--text-main);
+    font-weight: 600;
+    opacity: 1;
+  }
+}

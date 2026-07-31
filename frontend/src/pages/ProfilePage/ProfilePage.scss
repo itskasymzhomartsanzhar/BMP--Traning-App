@@ -162,3 +162,27 @@
 .settings-logout span:first-child {
   color: #e5877f;
 }
+
+// --- Модалка настроек: язык и система измерения ---
+
+.settings-modal__group {
+  margin-bottom: 18px;
+}
+
+.settings-modal__label {
+  margin-bottom: 10px;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.settings-modal__chips {
+  display: flex;
+  gap: 10px;
+
+  .onb-chip {
+    flex: 1;
+    text-align: center;
+  }
+}

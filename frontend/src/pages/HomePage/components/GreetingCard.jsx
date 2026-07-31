@@ -1,8 +1,11 @@
+import { useAppUI } from '../../../context/AppUIContext'
+
 function GreetingCard({ userName, gender }) {
-  const ready = gender === 'female' ? 'Готова' : 'Готов'
+  const { t } = useAppUI()
+  const ready = gender === 'female' ? t('home.readyFemale') : t('home.readyMale')
   return (
     <div className="greeting card animate-in">
-      <p>Привет, {userName}! <br/>{ready} к победам сегодня?</p>
+      <p>{t('home.greeting', { name: userName })} <br/>{ready}</p>
     </div>
   )
 }

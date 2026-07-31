@@ -40,7 +40,7 @@ function WelcomePage() {
             </div>
             <div className="welcome__feature">
               <FaBowlFood aria-hidden="true" />
-              <span>Питание и рецепты</span>
+              <span>Питание и КБЖУ</span>
             </div>
             <div className="welcome__feature">
               <FaChartLine aria-hidden="true" />

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { FaArrowLeft, FaCheck } from 'react-icons/fa6'
 import {
   GENDER_OPTIONS, GOAL_OPTIONS, LEVEL_OPTIONS, PLACE_OPTIONS, INJURY_OPTIONS,
-  DAY_OPTIONS, DAYS_BY_LEVEL, STEPS, calcAge, validateStep, buildPayload,
+  DAY_OPTIONS, DAYS_BY_LEVEL, stepsForForm, isCustomProgram, calcAge, validateStep, buildPayload,
 } from './steps'
 import './OnboardingPage.scss'
 
@@ -39,8 +39,12 @@ function OnboardingWizard({ initialName = '', onSubmit, onBackFromFirst, submitL
   const [errors, setErrors] = useState({})
   const [saving, setSaving] = useState(false)
 
-  const step = STEPS[stepIndex]
-  const progress = ((stepIndex + 1) / STEPS.length) * 100
+  // «Своя программа» укорачивает опрос до пяти шагов.
+  const steps = stepsForForm(form)
+  const custom = isCustomProgram(form)
+  const step = steps[stepIndex]
+  const progress = ((stepIndex + 1) / steps.length) * 100
+  const isLastStep = stepIndex === steps.length - 1
 
   const setField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -93,9 +97,9 @@ function OnboardingWizard({ initialName = '', onSubmit, onBackFromFirst, submitL
       setErrors(stepErrors)
       return
     }
-    if (stepIndex < STEPS.length - 1) {
+    if (!isLastStep) {
       // Входим на шаг дней впервые — подставляем рекомендацию по уровню.
-      if (STEPS[stepIndex + 1] === 'days' && form.trainingDays.length === 0) {
+      if (steps[stepIndex + 1] === 'days' && form.trainingDays.length === 0) {
         setForm((prev) => ({ ...prev, trainingDays: DAYS_BY_LEVEL[prev.level] ?? DAYS_BY_LEVEL.intermediate }))
       }
       setStepIndex((i) => i + 1)
@@ -120,10 +124,10 @@ function OnboardingWizard({ initialName = '', onSubmit, onBackFromFirst, submitL
             <FaArrowLeft />
           </button>
         ) : <span className="onb__back-placeholder" />}
-        <span className="onb__counter">{stepIndex + 1} / {STEPS.length}</span>
+        <span className="onb__counter">{stepIndex + 1} / {steps.length}</span>
       </header>
 
-      <div className="onb__progress" role="progressbar" aria-valuenow={stepIndex + 1} aria-valuemin={1} aria-valuemax={STEPS.length}>
+      <div className="onb__progress" role="progressbar" aria-valuenow={stepIndex + 1} aria-valuemin={1} aria-valuemax={steps.length}>
         <div className="onb__progress-fill" style={{ width: `${progress}%` }} />
       </div>
 
@@ -260,20 +264,29 @@ function OnboardingWizard({ initialName = '', onSubmit, onBackFromFirst, submitL
             </div>
             {errors.level && <span className="onb__error">{errors.level}</span>}
 
-            <p className="onb__label">Где тренируетесь</p>
-            <div className="onb__chips">
-              {PLACE_OPTIONS.map((o) => (
-                <button
-                  key={o.id}
-                  type="button"
-                  className={`onb-chip${form.place === o.id ? ' is-selected' : ''}`}
-                  onClick={() => setField('place', o.id)}
-                >
-                  {o.label}
-                </button>
-              ))}
-            </div>
-            {errors.place && <span className="onb__error">{errors.place}</span>}
+            {custom ? (
+              <p className="onb__hint">
+                Без готового плана: вы сами выберете упражнения и дни тренировок в приложении.
+              </p>
+            ) : (
+              <>
+                <p className="onb__label">Где тренируетесь</p>
+                <div className="onb__chips">
+                  {PLACE_OPTIONS.map((o) => (
+                    <button
+                      key={o.id}
+                      type="button"
+                      className={`onb-chip${form.place === o.id ? ' is-selected' : ''}`}
+                      onClick={() => setField('place', o.id)}
+                    >
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+                {errors.place && <span className="onb__error">{errors.place}</span>}
+              </>
+            )}
+            {errors.submit && step === 'level' && <span className="onb__error">{errors.submit}</span>}
           </div>
         )}
 
@@ -334,9 +347,9 @@ function OnboardingWizard({ initialName = '', onSubmit, onBackFromFirst, submitL
           }
         >
           {saving
-            ? 'Подбираем план…'
-            : stepIndex === STEPS.length - 1
-              ? submitLabel
+            ? (custom ? 'Сохраняем…' : 'Подбираем план…')
+            : isLastStep
+              ? (custom ? 'Продолжить' : submitLabel)
               : 'Далее'}
         </button>
       </footer>

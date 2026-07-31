@@ -8,20 +8,22 @@ import ProfileActionsCard from './components/ProfileActionsCard'
 import SubscriptionCard from './components/SubscriptionCard'
 import SettingsCard from './components/SettingsCard'
 import PersonalDataModal from './components/PersonalDataModal'
-import { FaCalculator, FaCrown } from 'react-icons/fa6'
+import SettingsModal from './components/SettingsModal'
 import './ProfilePage.scss'
 
-// Уведомления живут в SettingsCard, где тумблеры реально сохраняются.
-const PROFILE_ACTIONS = [
-  { id: 'personal', title: 'Личные данные', value: 'Редактировать' },
-  { id: 'subscription', title: 'Подписка', value: 'Premium' },
-  { id: 'settings', title: 'Настройки', value: 'Открыть' },
-]
+
 
 function ProfilePage() {
   const navigate = useNavigate()
-  const { showInfo, showPremium, showCalculator, userProfile, updateUserProfile } = useAppUI()
+  const { showPremium, showCalculator, userProfile, updateUserProfile, t } = useAppUI()
+
+  // Уведомления живут в SettingsCard, где тумблеры реально сохраняются.
+  const profileActions = [
+    { id: 'personal', title: t('profile.personal'), value: t('common.edit') },
+    { id: 'settings', title: t('profile.settings'), value: t('common.open') },
+  ]
   const [personalModalOpen, setPersonalModalOpen] = useState(false)
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false)
   const [subscription, setSubscription] = useState(null)
 
   useEffect(() => {
@@ -30,13 +32,12 @@ function ProfilePage() {
       .catch(() => {})
   }, [])
 
+  // Почта, вес и рост здесь не редактируются: почта — логин, вес и рост
+  // меняются замерами на странице Аналитика.
   const savePersonalData = (nextUser) => {
     const mapped = {
       display_name: nextUser.name,
-      email: nextUser.email,
       gender: { 'Мужской': 'male', 'Женский': 'female' }[nextUser.gender] || nextUser.gender,
-      weight: nextUser.weight,
-      height: nextUser.height,
       goal: { 'Сушка': 'cut', 'Набор массы': 'bulk', 'Поддержание': 'maintain', 'Выносливость': 'endurance', 'Рекомпозиция': 'recomp' }[nextUser.goal] || nextUser.goal,
     }
     updateUserProfile(mapped)
@@ -45,10 +46,7 @@ function ProfilePage() {
 
   const handleAction = (actionId) => {
     if (actionId === 'personal') { setPersonalModalOpen(true); return }
-    if (actionId === 'subscription') { showPremium(); return }
-    if (actionId === 'settings') {
-      showInfo('Настройки', 'Язык: Русский\nТема: Тёмная\nЕдиницы: кг / см')
-    }
+    if (actionId === 'settings') setSettingsModalOpen(true)
   }
 
   const subscriptionData = subscription
@@ -57,34 +55,19 @@ function ProfilePage() {
 
   return (
     <section className="page page-profile">
-      <SectionHead title="Профиль" />
+      <SectionHead title={t('profile.title')} />
 
       <ProfileMainCard user={userProfile} />
-      <ProfileActionsCard actions={PROFILE_ACTIONS} onAction={handleAction} />
-
-      <div className="profile-action-buttons card animate-in delay-2">
-        <button type="button" className="profile-action-btn" onClick={showCalculator}>
-          <FaCalculator />
-          <span>Калькулятор TDEE / BMI</span>
-        </button>
-        <button type="button" className="profile-action-btn profile-action-btn--premium" onClick={showPremium}>
-          <FaCrown />
-          <span>Управление Premium</span>
-        </button>
-      </div>
+      <ProfileActionsCard actions={profileActions} onAction={handleAction} />
 
       <div className="profile-extra-links card animate-in delay-2">
         <button type="button" className="profile-row" onClick={() => navigate('/nutrition')}>
-          <span>Питание</span>
-          <strong>Открыть</strong>
+          <span>{t('profile.nutrition')}</span>
+          <strong>{t('common.open')}</strong>
         </button>
-        <button type="button" className="profile-row" onClick={() => navigate('/knowledge')}>
-          <span>База знаний</span>
-          <strong>Открыть</strong>
-        </button>
-        <button type="button" className="profile-row" onClick={() => navigate('/analytics')}>
-          <span>Аналитика</span>
-          <strong>Открыть</strong>
+        <button type="button" className="profile-row" onClick={showCalculator}>
+          <span>{t('profile.calculator')}</span>
+          <strong>{t('common.open')}</strong>
         </button>
       </div>
 
@@ -97,6 +80,14 @@ function ProfilePage() {
           user={userProfile}
           onSave={savePersonalData}
           onClose={() => setPersonalModalOpen(false)}
+        />
+      ) : null}
+
+      {settingsModalOpen ? (
+        <SettingsModal
+          user={userProfile}
+          onSave={updateUserProfile}
+          onClose={() => setSettingsModalOpen(false)}
         />
       ) : null}
     </section>

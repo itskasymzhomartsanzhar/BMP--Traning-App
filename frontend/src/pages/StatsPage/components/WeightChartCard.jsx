@@ -1,4 +1,7 @@
+import { useAppUI } from '../../../context/AppUIContext'
+
 function WeightChartCard({ points }) {
+  const { t } = useAppUI()
   const width = 320
   const height = 180
   const padding = 14
@@ -6,10 +9,8 @@ function WeightChartCard({ points }) {
   if (points.length === 0) {
     return (
       <div className="card chart-card animate-in delay-2">
-        <h2>Вес (кг)</h2>
-        <p className="chart-card__empty">
-          Здесь появится график, как только вы добавите первый замер веса.
-        </p>
+        <h2>{t('stats.weightChart')}</h2>
+        <p className="chart-card__empty">{t('stats.weightChartEmpty')}</p>
       </div>
     )
   }

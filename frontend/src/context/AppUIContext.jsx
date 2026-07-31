@@ -8,6 +8,7 @@ import TrainingDaysModal from '../components/organisms/TrainingDaysModal/Trainin
 import { telegramLogin, telegramWidgetLogin, emailLogin, emailRegister, linkTelegram } from '../api/auth'
 import { getMe, updateMe, updateTrainingSchedule } from '../api/users'
 import { ACCESS_KEY, REFRESH_KEY, cleanupLegacyTokens } from '../api/tokenStorage'
+import { translate } from '../i18n/translations'
 
 const AppUIContext = createContext(null)
 
@@ -157,6 +158,10 @@ export function AppUIProvider({ children }) {
     }
   }, [])
 
+  // Язык интерфейса из профиля; до входа — русский.
+  const language = userProfile?.language === 'en' ? 'en' : 'ru'
+  const t = useCallback((key, params) => translate(language, key, params), [language])
+
   // Анкета проставляет и профиль, и рекомендованное расписание разом.
   const completeOnboarding = useCallback((nextUser) => {
     setUserProfile(nextUser)
@@ -248,11 +253,13 @@ export function AppUIProvider({ children }) {
       loginWithEmail,
       registerWithEmail,
       loginWithTelegramWidget,
+      language,
+      t,
       linkTelegramAccount,
       logout,
       devLogin,
     }),
-    [authReady, authStatus, isAuthenticated, showToast, showModal, showInfo, showConfirm, closeModal, showPremium, showCalculator, workoutCount, trainingDays, showTrainingDays, userProfile, updateUserProfile, isOnboarded, completeOnboarding, loginWithEmail, registerWithEmail, loginWithTelegramWidget, linkTelegramAccount, logout, devLogin],
+    [authReady, authStatus, isAuthenticated, showToast, showModal, showInfo, showConfirm, closeModal, showPremium, showCalculator, workoutCount, trainingDays, showTrainingDays, userProfile, updateUserProfile, isOnboarded, completeOnboarding, loginWithEmail, registerWithEmail, loginWithTelegramWidget, language, t, linkTelegramAccount, logout, devLogin],
   )
 
   return (

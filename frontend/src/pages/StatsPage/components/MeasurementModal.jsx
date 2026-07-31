@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { FaXmark } from 'react-icons/fa6'
 import { addMeasurement } from '../../../api/analytics'
+import { useAppUI } from '../../../context/AppUIContext'
 import './MeasurementModal.scss'
 
 // Обхваты сверху вниз по телу: шея, грудь, талия, бёдра.
 const FIELDS = [
-  { field: 'neck_cm', label: 'Шея', placeholder: '38' },
-  { field: 'chest_cm', label: 'Грудь', placeholder: '100' },
-  { field: 'waist_cm', label: 'Талия', placeholder: '82' },
-  { field: 'hip_cm', label: 'Бёдра', placeholder: '96' },
+  { field: 'neck_cm', labelKey: 'stats.neck', placeholder: '38' },
+  { field: 'chest_cm', labelKey: 'stats.chest', placeholder: '100' },
+  { field: 'waist_cm', labelKey: 'stats.waist', placeholder: '82' },
+  { field: 'hip_cm', labelKey: 'stats.hips', placeholder: '96' },
 ]
 
 function initialValues(current) {
@@ -27,6 +28,7 @@ function initialValues(current) {
  * значениями. Один POST со всеми полями за сегодняшнюю дату.
  */
 function MeasurementModal({ current = [], onClose, onSaved }) {
+  const { t } = useAppUI()
   const [values, setValues] = useState(() => initialValues(current))
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -44,14 +46,14 @@ function MeasurementModal({ current = [], onClose, onSaved }) {
       if (raw === '') continue
       const num = Number(raw)
       if (!Number.isFinite(num) || num < 10 || num > 250) {
-        setError('Проверьте значения — обхваты в сантиметрах (10–250).')
+        setError(t('stats.measureRangeError'))
         return
       }
       payload[field] = Math.round(num)
       filled += 1
     }
     if (filled === 0) {
-      setError('Заполните хотя бы один замер.')
+      setError(t('stats.measureEmptyError'))
       return
     }
     setSaving(true)
@@ -62,7 +64,7 @@ function MeasurementModal({ current = [], onClose, onSaved }) {
         onClose()
       })
       .catch(() => {
-        setError('Не удалось сохранить. Попробуйте ещё раз.')
+        setError(t('stats.measureSaveError'))
         setSaving(false)
       })
   }
@@ -71,20 +73,18 @@ function MeasurementModal({ current = [], onClose, onSaved }) {
     <div className="meas-overlay" role="presentation" onClick={onClose}>
       <div className="card meas-sheet" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
         <div className="meas-head">
-          <h2>Замеры тела</h2>
+          <h2>{t('stats.bodyMeasurements')}</h2>
           <button type="button" className="meas-close" onClick={onClose} aria-label="Закрыть">
             <FaXmark />
           </button>
         </div>
 
-        <p className="meas-hint">
-          Обхваты в сантиметрах. Замеряйте утром натощак — так динамика точнее.
-        </p>
+        <p className="meas-hint">{t('stats.measureHint')}</p>
 
         <div className="meas-fields">
-          {FIELDS.map(({ field, label, placeholder }) => (
+          {FIELDS.map(({ field, labelKey, placeholder }) => (
             <label key={field} className="meas-field">
-              <span className="meas-field__label">{label}</span>
+              <span className="meas-field__label">{t(labelKey)}</span>
               <span className="meas-field__control">
                 <input
                   type="number"
@@ -95,7 +95,7 @@ function MeasurementModal({ current = [], onClose, onSaved }) {
                   value={values[field]}
                   onChange={(e) => setField(field, e.target.value)}
                 />
-                <span className="meas-field__unit">см</span>
+                <span className="meas-field__unit">{t('stats.cm')}</span>
               </span>
             </label>
           ))}
@@ -105,10 +105,10 @@ function MeasurementModal({ current = [], onClose, onSaved }) {
 
         <div className="meas-actions">
           <button type="button" className="secondary" onClick={onClose} disabled={saving}>
-            Отмена
+            {t('common.cancel')}
           </button>
           <button type="button" className="primary" onClick={save} disabled={saving}>
-            {saving ? 'Сохраняем…' : 'Сохранить'}
+            {saving ? t('stats.saving') : t('common.save')}
           </button>
         </div>
       </div>

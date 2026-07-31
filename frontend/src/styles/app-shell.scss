@@ -39,6 +39,9 @@
 }
 
 .top-status__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--font-display);
   font-size: 14px;
   font-weight: 700;
@@ -48,6 +51,12 @@
   flex: 1;
   min-width: 0;
   white-space: nowrap;
+}
+
+.top-status__logo {
+  height: 22px;
+  width: auto;
+  flex-shrink: 0;
 }
 
 .top-status__actions {

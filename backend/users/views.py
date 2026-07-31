@@ -255,24 +255,33 @@ def _apply_onboarding(user, data):
     user.weight = data['weight']
     user.goal = data['goal']
     user.level = data['level']
-    user.place = data['place']
+    user.place = data.get('place', '')
     user.injuries = data.get('injuries', [])
 
-    program_id, reason = recommend_program(
-        goal=user.goal,
-        level=user.level,
-        place=user.place,
-        injuries=user.injuries,
-        age=user.age,
-    )
-    user.recommended_program = program_id or ''
+    if user.level == 'custom':
+        # «Своя программа»: ничего не рекомендуем — человек сам выбирает
+        # дни и упражнения уже в приложении.
+        program_id, reason = None, ''
+        user.recommended_program = ''
+        chosen_days = data.get('training_days') or []
+        if chosen_days:
+            user.training_days = chosen_days
+    else:
+        program_id, reason = recommend_program(
+            goal=user.goal,
+            level=user.level,
+            place=user.place,
+            injuries=user.injuries,
+            age=user.age,
+        )
+        user.recommended_program = program_id or ''
 
-    # Дни из анкеты главнее; без них — прежнее расписание или рекомендация.
-    chosen_days = data.get('training_days') or []
-    if chosen_days:
-        user.training_days = chosen_days
-    elif not user.training_days:
-        user.training_days = recommend_training_days(user.level)
+        # Дни из анкеты главнее; без них — прежнее расписание или рекомендация.
+        chosen_days = data.get('training_days') or []
+        if chosen_days:
+            user.training_days = chosen_days
+        elif not user.training_days:
+            user.training_days = recommend_training_days(user.level)
 
     user.onboarded_at = timezone.now()
     user.save()
@@ -320,10 +329,19 @@ class PlanPreviewView(APIView):
         today = date.today()
         age = today.year - birth.year - ((today.month, today.day) < (birth.month, birth.day))
 
+        if data['level'] == 'custom':
+            # «Своя программа» — плана нет, человек собирает всё сам.
+            return Response({
+                'program_id': None,
+                'reason': '',
+                'program': None,
+                'training_days': data.get('training_days') or [],
+            })
+
         program_id, reason = recommend_program(
             goal=data['goal'],
             level=data['level'],
-            place=data['place'],
+            place=data.get('place', ''),
             injuries=data.get('injuries', []),
             age=age,
         )

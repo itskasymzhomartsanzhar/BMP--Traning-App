@@ -1,9 +1,13 @@
 import { FaCrown, FaFireFlameSimple } from 'react-icons/fa6'
+import logoMark from '../../assets/logo-mark.png'
 
 function TopStatus({ streak = 0, onStreakClick, onPremiumClick }) {
   return (
     <header className="top-status">
-      <div className="top-status__title">TRES</div>
+      <div className="top-status__title">
+        <img className="top-status__logo" src={logoMark} alt="" aria-hidden="true" />
+        TRES
+      </div>
 
       <div className="top-status__actions">
         <button type="button" className="streak-button" aria-label="Серия тренировок" onClick={onStreakClick}>

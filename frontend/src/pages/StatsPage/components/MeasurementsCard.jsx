@@ -1,10 +1,20 @@
+import { useAppUI } from '../../../context/AppUIContext'
+
+const FIELD_KEYS = {
+  neck_cm: 'stats.neck',
+  chest_cm: 'stats.chest',
+  waist_cm: 'stats.waist',
+  hip_cm: 'stats.hips',
+}
+
 function MeasurementsCard({ measurements, onEdit }) {
+  const { t } = useAppUI()
   const hasData = measurements.length > 0
 
   return (
     <div className="card params-card animate-in delay-2">
       <div className="params-card__head">
-        <h2>Параметры</h2>
+        <h2>{t('stats.params')}</h2>
         {hasData && (
           <button type="button" className="ghost" onClick={onEdit} aria-label="Изменить замеры">
             ✎
@@ -15,18 +25,16 @@ function MeasurementsCard({ measurements, onEdit }) {
         <div className="params-grid">
           {measurements.map((item) => (
             <div key={item.label} className="param-row">
-              <span>{item.label}</span>
-              <strong>{item.value}</strong>
+              <span>{FIELD_KEYS[item.field] ? t(FIELD_KEYS[item.field]) : item.label}</span>
+              <strong>{String(item.value).replace(' см', ` ${t('stats.cm')}`).replace(' кг', ` ${t('stats.kg')}`)}</strong>
             </div>
           ))}
         </div>
       ) : (
         <>
-          <p className="params-card__empty">
-            Замеров пока нет. Добавьте первый — и здесь появится ваша динамика.
-          </p>
+          <p className="params-card__empty">{t('stats.noMeasurements')}</p>
           <button type="button" className="secondary" onClick={onEdit}>
-            + Добавить замеры
+            {t('stats.addMeasurements')}
           </button>
         </>
       )}

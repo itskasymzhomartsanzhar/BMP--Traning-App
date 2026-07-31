@@ -1,7 +1,10 @@
+import { useAppUI } from '../../../context/AppUIContext'
+
 function ActivityCard({ items, onDayClick }) {
+  const { t } = useAppUI()
   return (
     <div className="card activity-card animate-in delay-3">
-      <h2>Активность по дням</h2>
+      <h2>{t('stats.activityByDay')}</h2>
       <div className="bars">
         {items.map((item) => (
           <button

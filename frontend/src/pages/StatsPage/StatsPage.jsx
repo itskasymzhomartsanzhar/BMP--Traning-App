@@ -16,7 +16,7 @@ import './StatsPage.scss'
 
 function StatsPage() {
   const [activeTab, setActiveTab] = useState('dynamics')
-  const { showInfo, showToast, showModal } = useAppUI()
+  const { showInfo, showToast, showModal, userProfile, updateUserProfile, t } = useAppUI()
 
   const [activity, setActivity] = useState([])
   const [weightHistory, setWeightHistory] = useState([])
@@ -35,24 +35,47 @@ function StatsPage() {
 
   const handleAddWeight = () => {
     showModal({
-      title: 'Добавить замер веса',
-      message: 'Введите текущий вес (кг):',
-      input: { type: 'number', step: '0.1', placeholder: 'Например, 72.5' },
+      title: t('stats.addWeightTitle'),
+      message: t('stats.addWeightMessage'),
+      input: { type: 'number', step: '0.1', placeholder: t('stats.addWeightPlaceholder') },
       actions: [
-        { label: 'Отмена', variant: 'secondary', onClick: () => {} },
+        { label: t('common.cancel'), variant: 'secondary', onClick: () => {} },
         {
-          label: 'Сохранить',
+          label: t('common.save'),
           variant: 'primary',
           onClick: (inputValue) => {
             const val = parseFloat(inputValue || '0')
             if (!(val > 0)) {
-              showToast('Введите вес больше нуля')
+              showToast(t('stats.weightError'))
               return
             }
             const today = new Date().toISOString().slice(0, 10)
             addWeight(val, today)
               .then(() => getWeightHistory().then(({ data }) => setWeightHistory(data)))
-              .catch(() => showToast('Не удалось сохранить вес'))
+              .catch(() => showToast(t('stats.weightSaveError')))
+          },
+        },
+      ],
+    })
+  }
+
+  const handleEditHeight = () => {
+    showModal({
+      title: t('stats.editHeightTitle'),
+      message: userProfile?.height ? t('stats.heightCurrent', { height: userProfile.height }) : t('stats.heightEmpty'),
+      input: { type: 'number', step: '1', defaultValue: userProfile?.height ?? '', placeholder: t('stats.heightPlaceholder') },
+      actions: [
+        { label: t('common.cancel'), variant: 'secondary', onClick: () => {} },
+        {
+          label: t('common.save'),
+          variant: 'primary',
+          onClick: (inputValue) => {
+            const height = Math.round(Number(String(inputValue).replace(',', '.')))
+            if (!Number.isFinite(height) || height < 80 || height > 250) {
+              showToast(t('stats.heightError'))
+              return
+            }
+            updateUserProfile({ height })
           },
         },
       ],
@@ -61,7 +84,7 @@ function StatsPage() {
 
   return (
     <section className="page page-stats">
-      <SectionHead title="Аналитика" />
+      <SectionHead title={t('stats.title')} />
 
       <ProgressTabs activeTab={activeTab} onChange={setActiveTab} />
 
@@ -69,12 +92,17 @@ function StatsPage() {
         <>
           <WeightChartCard points={weightHistory} />
           <button type="button" className="secondary animate-in delay-3" onClick={handleAddWeight}>
-            + Добавить замер веса
+            {t('stats.addWeight')}
           </button>
         </>
       )}
       {activeTab === 'measurements' && (
-        <MeasurementsCard measurements={measurements} onEdit={() => setMeasureOpen(true)} />
+        <>
+          <MeasurementsCard measurements={measurements} onEdit={() => setMeasureOpen(true)} />
+          <button type="button" className="secondary animate-in delay-3" onClick={handleEditHeight}>
+            {t('stats.editHeight')}{userProfile?.height ? ` · ${t('stats.heightNow', { height: userProfile.height })}` : ''}
+          </button>
+        </>
       )}
       {activeTab === 'photo' && (
         <PhotoProgressCard photos={photos} onAdd={() => setCaptureOpen(true)} />

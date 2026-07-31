@@ -1,64 +1,49 @@
+import { useAppUI } from '../../../context/AppUIContext'
 import menFigure from '../../../assets/men.png'
 import womenFigure from '../../../assets/women.png'
 
-const LEVEL_NUM = { beginner: 1, intermediate: 2, advanced: 3 }
-
-const GOAL_META = {
-  cut: { label: 'Сушка', hint: 'талия + дефицит без срыва' },
-  bulk: { label: 'Набор массы', hint: 'профицит + сила без жира' },
-  maintain: { label: 'Поддержание', hint: 'форма и тонус каждый день' },
-  endurance: { label: 'Выносливость', hint: 'больше энергии и дыхалки' },
-  recomp: { label: 'Рекомпозиция', hint: 'меньше жира, больше мышц' },
-}
-
-function bmiCategory(bmi) {
-  if (bmi < 18.5) return 'дефицит'
-  if (bmi < 25) return 'норма'
-  if (bmi < 30) return 'избыток'
-  return 'высокий избыток'
-}
-
-// Ориентир — направление без жёстких цифр: до границы нормы BMI, с мягким шагом.
-function buildTarget(goal, weight, height, bmi) {
-  const canCalc = Number.isFinite(weight) && Number.isFinite(bmi)
-  const heightM = height / 100
-
-  if (goal === 'cut') {
-    if (!canCalc) return { value: 'Минус вес', hint: 'плавный дефицит' }
-    const normalWeight = 24.9 * heightM * heightM
-    const diff = Math.max(0, weight - normalWeight)
-    const step = diff > 0 ? Math.min(Math.round(diff), Math.max(2, Math.round(weight * 0.1))) : 2
-    return { value: `Минус ${step} кг`, hint: 'без цифры на скорость' }
+// Та же формула, что в калькуляторе питания: Миффлин-Сан Жеор,
+// активность 1.55, дефицит/профицит 300 ккал под цель.
+function calcMacros(profile, weight) {
+  const height = Number(profile?.height)
+  const age = Number(profile?.age)
+  if (!Number.isFinite(weight) || !Number.isFinite(height) || !Number.isFinite(age) || !height || !age) {
+    return null
   }
-  if (goal === 'bulk') {
-    if (!canCalc) return { value: 'Плюс вес', hint: 'чистый набор' }
-    const step = Math.max(2, Math.min(8, Math.round(weight * 0.07)))
-    return { value: `Плюс ${step} кг`, hint: 'чистый набор' }
-  }
-  if (goal === 'recomp') return { value: 'Вес на месте', hint: 'состав тела меняем' }
-  if (goal === 'endurance') return { value: 'Темп и объём', hint: 'вес вторичен' }
-  return { value: 'Держать вес', hint: 'стабильность решает' }
+  const bmr = profile?.gender === 'female'
+    ? 10 * weight + 6.25 * height - 5 * age - 161
+    : 10 * weight + 6.25 * height - 5 * age + 5
+  const tdee = bmr * 1.55
+  const kcal = Math.round(
+    profile?.goal === 'cut' ? tdee - 300 : profile?.goal === 'bulk' ? tdee + 300 : tdee,
+  )
+  const protein = Math.round(weight * 2)
+  const fat = Math.round(weight * 0.8)
+  const carbs = Math.max(0, Math.round((kcal - protein * 4 - fat * 9) / 4))
+  return { kcal, protein, fat, carbs }
 }
 
 /**
- * Блок «Твоя цель»: фигура по полу слева, вес / BMI / рост справа,
- * снизу цель из анкеты и ориентир. Все цифры считаются из профиля.
+ * Блок «Твоя цель»: фигура по полу слева, вес / КБЖУ / рост справа,
+ * снизу цель из анкеты. Все цифры считаются из профиля.
  */
+const GOAL_IDS = ['cut', 'bulk', 'maintain', 'endurance', 'recomp']
+
 function YourGoalCard({ profile, currentWeight, onClick }) {
+  const { t } = useAppUI()
   const weight = Number(currentWeight ?? profile?.weight)
   const height = Number(profile?.height)
-  const hasBody = Number.isFinite(weight) && Number.isFinite(height) && height > 0
 
-  const bmi = hasBody ? weight / ((height / 100) ** 2) : NaN
-  const goal = GOAL_META[profile?.goal] ?? { label: 'Цель', hint: 'заполните анкету' }
-  const target = buildTarget(profile?.goal, weight, height, bmi)
-  const level = LEVEL_NUM[profile?.level] ?? 1
+  const goal = GOAL_IDS.includes(profile?.goal)
+    ? { label: t(`goals.${profile.goal}`), hint: t(`goalHints.${profile.goal}`) }
+    : { label: t('home.goal'), hint: t('home.fillSurvey') }
+  const macros = calcMacros(profile, weight)
   const figure = profile?.gender === 'female' ? womenFigure : menFigure
 
   return (
     <button type="button" className="your-goal card animate-in delay-1" onClick={onClick}>
       <div className="your-goal__head">
-        <h2>Твоя цель</h2>
+        <h2>{t('home.yourGoal')}</h2>
       </div>
 
 
@@ -69,31 +54,26 @@ function YourGoalCard({ profile, currentWeight, onClick }) {
 
         <div className="your-goal__stats">
           <div className="your-goal__cell">
-            <span>Вес сейчас</span>
-            <strong>{Number.isFinite(weight) ? `${weight.toFixed(1)} кг` : '—'}</strong>
+            <span>{t('home.weightNow')}</span>
+            <strong>{Number.isFinite(weight) ? `${weight.toFixed(1)} ${t('stats.kg')}` : '—'}</strong>
           </div>
           <div className="your-goal__cell">
-            <span>BMI</span>
-            <strong>{hasBody ? bmi.toFixed(1) : '—'}</strong>
-            {hasBody && <em>{bmiCategory(bmi)}</em>}
+            <span>{t('home.dailyMacros')}</span>
+            <strong>{macros ? `${macros.kcal} ${t('home.kcal')}` : '—'}</strong>
+            {macros && <em>{t('home.macrosShort', { p: macros.protein, f: macros.fat, c: macros.carbs })}</em>}
           </div>
           <div className="your-goal__cell">
-            <span>Рост</span>
-            <strong>{Number.isFinite(height) ? `${height} см` : '—'}</strong>
+            <span>{t('home.height')}</span>
+            <strong>{Number.isFinite(height) && height ? `${height} ${t('stats.cm')}` : '—'}</strong>
           </div>
         </div>
       </div>
 
       <div className="your-goal__foot">
         <div className="your-goal__cell">
-          <span>Цель</span>
+          <span>{t('home.goal')}</span>
           <strong>{goal.label}</strong>
           <em>{goal.hint}</em>
-        </div>
-        <div className="your-goal__cell">
-          <span>Ориентир</span>
-          <strong>{target.value}</strong>
-          <em>{target.hint}</em>
         </div>
       </div>
     </button>
