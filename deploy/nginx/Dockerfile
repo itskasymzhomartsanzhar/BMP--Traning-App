@@ -8,11 +8,11 @@ RUN yarn install --frozen-lockfile
 
 COPY frontend/ ./
 
-# API на том же домене — относительный путь; username бота приходит аргументом.
+# API на том же домене — относительный путь; client id Telegram-входа приходит аргументом.
 ARG VITE_API_URL=/api
-ARG VITE_TG_BOT_USERNAME=
+ARG VITE_TG_LOGIN_CLIENT_ID=
 ENV VITE_API_URL=$VITE_API_URL \
-    VITE_TG_BOT_USERNAME=$VITE_TG_BOT_USERNAME
+    VITE_TG_LOGIN_CLIENT_ID=$VITE_TG_LOGIN_CLIENT_ID
 
 RUN yarn build
 

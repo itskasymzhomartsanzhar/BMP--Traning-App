@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .auth import WebAppAuth, LoginWidgetAuth, AuthError
+from .auth import WebAppAuth, LoginWidgetAuth, TelegramLoginOidcAuth, AuthError
 from .models import User
 from .recommendation import recommend_program, recommend_training_days
 from .serializers import (
@@ -395,18 +395,49 @@ class EmailLoginView(APIView):
         return Response({'tokens': _get_tokens(user), 'user': UserSerializer(user).data})
 
 
+def _telegram_login_client_ids():
+    client_ids = []
+    configured = [
+        getattr(settings, 'TELEGRAM_LOGIN_CLIENT_ID', ''),
+        *getattr(settings, 'TELEGRAM_LOGIN_CLIENT_IDS', []),
+    ]
+    bot_token = settings.TELEGRAM_BOT_TOKEN
+    if bot_token:
+        configured.append(str(bot_token).split(':', 1)[0])
+    for value in configured:
+        normalized = str(value or '').strip()
+        if normalized and normalized not in client_ids:
+            client_ids.append(normalized)
+    return client_ids
+
+
+def _telegram_widget_user_data(data):
+    """Данные пользователя из кнопки Telegram: новый SDK (id_token) или подпись старого виджета."""
+    payload = dict(data)
+    id_token = str(payload.get('id_token') or '').strip()
+    if id_token:
+        return TelegramLoginOidcAuth(
+            client_ids=_telegram_login_client_ids(),
+            jwks_url=getattr(settings, 'TELEGRAM_LOGIN_JWKS_URL', None),
+            jwks_cache_seconds=getattr(settings, 'TELEGRAM_LOGIN_JWKS_CACHE_SECONDS', 3600),
+        ).get_user_data(id_token)
+
+    bot_token = settings.TELEGRAM_BOT_TOKEN
+    if not bot_token:
+        raise AuthError(status=503, detail='bot token is not configured')
+    return LoginWidgetAuth(bot_token).get_user_data(payload)
+
+
 class TelegramWidgetAuthView(APIView):
-    """Вход на сайте через Telegram Login Widget: создаёт аккаунт или логинит."""
+    """Вход на сайте через кнопку Telegram: создаёт аккаунт или логинит."""
     permission_classes = [AllowAny]
 
     def post(self, request):
-        bot_token = settings.TELEGRAM_BOT_TOKEN
-        if not bot_token:
-            return Response({'detail': 'Bot token not configured'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
-
         try:
-            user_data = LoginWidgetAuth(bot_token).get_user_data(dict(request.data))
-        except (AuthError, KeyError, ValueError):
+            user_data = _telegram_widget_user_data(request.data)
+        except AuthError as err:
+            return Response({'detail': 'Не удалось подтвердить данные Telegram.'}, status=err.status)
+        except (KeyError, ValueError):
             return Response({'detail': 'Не удалось подтвердить данные Telegram.'}, status=status.HTTP_403_FORBIDDEN)
 
         user, created = User.objects.get_or_create(
@@ -432,13 +463,11 @@ class LinkTelegramView(APIView):
         if request.user.tg_id:
             return Response({'detail': 'Telegram уже подключён.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        bot_token = settings.TELEGRAM_BOT_TOKEN
-        if not bot_token:
-            return Response({'detail': 'Bot token not configured'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
-
         try:
-            user_data = LoginWidgetAuth(bot_token).get_user_data(dict(request.data))
-        except (AuthError, KeyError, ValueError):
+            user_data = _telegram_widget_user_data(request.data)
+        except AuthError as err:
+            return Response({'detail': 'Не удалось подтвердить данные Telegram.'}, status=err.status)
+        except (KeyError, ValueError):
             return Response({'detail': 'Не удалось подтвердить данные Telegram.'}, status=status.HTTP_403_FORBIDDEN)
 
         tg_id = user_data['tg_id']

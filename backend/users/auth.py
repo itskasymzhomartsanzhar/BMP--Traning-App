@@ -7,6 +7,11 @@ from operator import itemgetter
 from typing import Any
 from urllib.parse import unquote, parse_qsl
 
+import jwt
+import requests
+from django.core.cache import cache
+from jwt import InvalidTokenError, PyJWK
+
 
 @dataclass(eq=False)
 class AuthError(Exception):
@@ -101,3 +106,102 @@ class LoginWidgetAuth:
             'first_name': data.get('first_name', ''),
             'avatar_url': data.get('photo_url', ''),
         }
+
+
+class TelegramLoginOidcAuth:
+    """Вход через новый Telegram Login SDK (telegram-login.js?5).
+
+    SDK возвращает OIDC id_token — JWT, подписанный Telegram. Проверяем
+    подпись по JWKS с oauth.telegram.org, издателя и аудиторию (client_id
+    из настроек Web Login мини-аппа в BotFather).
+    https://core.telegram.org/widgets/login
+    """
+
+    ISSUER = 'https://oauth.telegram.org'
+    DEFAULT_JWKS_URL = 'https://oauth.telegram.org/.well-known/jwks.json'
+    ALLOWED_ALGORITHMS = ['RS256', 'ES256', 'EdDSA', 'ES256K']
+    JWKS_CACHE_KEY = 'telegram_login:jwks'
+
+    def __init__(self, client_ids, jwks_url=None, jwks_cache_seconds=3600):
+        self._client_ids = [str(cid).strip() for cid in client_ids if str(cid or '').strip()]
+        self._jwks_url = str(jwks_url or self.DEFAULT_JWKS_URL)
+        self._jwks_cache_seconds = int(jwks_cache_seconds)
+
+    def get_user_data(self, id_token: str) -> dict:
+        payload = self._decode(id_token)
+        telegram_user = payload.get('https://telegram.org/user') or {}
+        if not isinstance(telegram_user, dict):
+            telegram_user = {}
+
+        telegram_id = telegram_user.get('id') or payload.get('id') or payload.get('sub')
+        if telegram_id is None:
+            raise AuthError(detail='telegram user id is missing')
+
+        first_name = str(telegram_user.get('first_name') or payload.get('given_name') or '').strip()
+        last_name = str(telegram_user.get('last_name') or payload.get('family_name') or '').strip()
+        display_name = ' '.join(part for part in [first_name, last_name] if part).strip()
+        username = str(telegram_user.get('username') or payload.get('preferred_username') or '').strip()
+        photo_url = str(telegram_user.get('photo_url') or payload.get('picture') or '').strip()
+
+        return {
+            'tg_id': int(telegram_id),
+            'username': username,
+            'first_name': display_name or first_name or username,
+            'avatar_url': photo_url,
+        }
+
+    def _decode(self, id_token: str) -> dict:
+        token = str(id_token or '').strip()
+        if not token:
+            raise AuthError(detail='empty id_token')
+        if not self._client_ids:
+            raise AuthError(status=503, detail='telegram login client id is not configured')
+
+        signing_key = self._get_signing_key(token)
+        last_error = None
+        for client_id in self._client_ids:
+            try:
+                return jwt.decode(
+                    token,
+                    signing_key,
+                    algorithms=self.ALLOWED_ALGORITHMS,
+                    audience=client_id,
+                    issuer=self.ISSUER,
+                    options={'require': ['exp', 'iat', 'iss', 'aud', 'sub']},
+                )
+            except InvalidTokenError as exc:
+                last_error = exc
+        raise AuthError(detail=str(last_error) or 'invalid id_token')
+
+    def _get_signing_key(self, id_token: str):
+        try:
+            header = jwt.get_unverified_header(id_token)
+        except Exception as exc:
+            raise AuthError(detail=f'invalid id_token header: {exc}')
+
+        key_id = header.get('kid')
+        for force_refresh in (False, True):
+            jwks = self._fetch_jwks(force=force_refresh)
+            for jwk_data in jwks.get('keys', []):
+                if key_id and jwk_data.get('kid') != key_id:
+                    continue
+                return PyJWK.from_dict(jwk_data).key
+        raise AuthError(detail='telegram signing key is not found')
+
+    def _fetch_jwks(self, force=False) -> dict:
+        if not force:
+            cached = cache.get(self.JWKS_CACHE_KEY)
+            if isinstance(cached, dict) and cached.get('keys'):
+                return cached
+
+        try:
+            response = requests.get(self._jwks_url, timeout=(5, 15))
+            response.raise_for_status()
+            jwks = response.json()
+        except Exception as exc:
+            raise AuthError(status=503, detail=f'telegram jwks is unavailable: {exc}')
+
+        if not isinstance(jwks, dict) or not jwks.get('keys'):
+            raise AuthError(status=503, detail='telegram jwks is empty')
+        cache.set(self.JWKS_CACHE_KEY, jwks, self._jwks_cache_seconds)
+        return jwks

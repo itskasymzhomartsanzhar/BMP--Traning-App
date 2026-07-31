@@ -21,7 +21,7 @@ function SettingsCard() {
     if (!telegramWidgetConfigured) {
       showInfo(
         'Подключение Telegram',
-        'Виджет входа не настроен.\n\nЗадайте VITE_TG_BOT_USERNAME в .env фронтенда и привяжите домен к боту командой /setdomain в BotFather.',
+        'Вход через Telegram не настроен.\n\nЗадайте VITE_TG_LOGIN_CLIENT_ID в .env фронтенда (Client ID из BotFather: My Bots → Bot Settings → Web Login) и добавьте домен сайта в Allowed URLs там же.',
       )
       return
     }

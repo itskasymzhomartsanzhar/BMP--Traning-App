@@ -132,6 +132,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default='')
 TELEGRAM_DEV_MODE = config('TELEGRAM_DEV_MODE', default=False, cast=bool)
 
+# Web Login мини-аппа в BotFather: My Bots → Bot Settings → Web Login.
+# Client ID оттуда же; там же нужно добавить домен сайта в Allowed URLs.
+TELEGRAM_LOGIN_CLIENT_ID = config('TELEGRAM_LOGIN_CLIENT_ID', default='')
+TELEGRAM_LOGIN_CLIENT_IDS = [
+    value.strip()
+    for value in config('TELEGRAM_LOGIN_CLIENT_IDS', default='').split(',')
+    if value.strip()
+]
+TELEGRAM_LOGIN_JWKS_URL = config(
+    'TELEGRAM_LOGIN_JWKS_URL',
+    default='https://oauth.telegram.org/.well-known/jwks.json',
+)
+TELEGRAM_LOGIN_JWKS_CACHE_SECONDS = config('TELEGRAM_LOGIN_JWKS_CACHE_SECONDS', default=3600, cast=int)
+
 # Kinescope — видеохостинг для роликов упражнений (загрузка из админки).
 KINESCOPE_API_TOKEN = "029b007b-495b-4bb3-b750-f86254a4e9ef"
 KINESCOPE_PARENT_ID = "49c1c3b5-338c-4ee6-869a-35d65cbbd7d8"

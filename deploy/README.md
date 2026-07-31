@@ -28,9 +28,11 @@ docker compose up -d --build
 ## Telegram
 
 - **Мини-апп**: в BotFather задать Web App URL → `https://tresfit.ru`.
-- **Кнопка «Войти через Telegram» на сайте**: в BotFather `/setdomain` → `tresfit.ru`,
-  и заполнить `VITE_TG_BOT_USERNAME` в .env **до** сборки
-  (кнопка вшивается в сборку фронтенда).
+- **Кнопка «Войти через Telegram» на сайте** (новый Login SDK, OIDC):
+  в BotFather открыть My Bots → Bot Settings → **Web Login**, добавить
+  `https://tresfit.ru` в Allowed URLs и взять оттуда Client ID.
+  Заполнить `TELEGRAM_LOGIN_CLIENT_ID` (бэкенд) и `VITE_TG_LOGIN_CLIENT_ID`
+  в .env **до** сборки (кнопка вшивается в сборку фронтенда).
 
 ## Полезное
 
