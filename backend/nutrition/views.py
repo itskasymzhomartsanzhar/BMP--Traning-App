@@ -63,6 +63,7 @@ class WaterView(APIView):
 
         amount = float(request.data.get('amount_liters', 0))
         day, _ = NutritionDay.objects.get_or_create(user=request.user, date=target_date)
-        day.water_liters = min(round(day.water_liters + amount, 2), 10.0)
+        # amount может быть отрицательным (кнопка «минус») — не ниже нуля.
+        day.water_liters = min(max(round(day.water_liters + amount, 2), 0.0), 10.0)
         day.save(update_fields=['water_liters'])
         return Response({'date': str(target_date), 'liters': day.water_liters, 'target': day.target_water_liters})

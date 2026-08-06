@@ -4,10 +4,12 @@ import { useAppUI } from '../../../context/AppUIContext'
 import './PersonalDataModal.scss'
 
 const GENDER_OPTIONS = ['Мужской', 'Женский']
-const GOAL_OPTIONS = ['Сушка', 'Набор массы', 'Поддержание', 'Выносливость', 'Рекомпозиция']
+const GOAL_OPTIONS = ['Сушка', 'Рекомп', 'Набор']
 
 const GENDER_FROM_API = { male: 'Мужской', female: 'Женский' }
-const GOAL_FROM_API = { cut: 'Сушка', bulk: 'Набор массы', maintain: 'Поддержание', endurance: 'Выносливость', recomp: 'Рекомпозиция' }
+// Прочие цели (поддержание, выносливость) в списке нет — при
+// редактировании пользователь выберет одну из трёх.
+const GOAL_FROM_API = { cut: 'Сушка', recomp: 'Рекомп', bulk: 'Набор' }
 
 function toInputValue(value) {
   return value === undefined || value === null ? '' : String(value)
@@ -28,7 +30,7 @@ function PersonalDataModal({ user, onSave, onClose }) {
   const initialForm = useMemo(() => ({
     name: toInputValue(user?.name || user?.display_name || user?.first_name),
     gender: toInputValue(GENDER_FROM_API[user?.gender] || user?.gender_display || user?.gender),
-    goal: toInputValue(GOAL_FROM_API[user?.goal] || user?.goal_display || user?.goal),
+    goal: toInputValue(GOAL_FROM_API[user?.goal] || ''),
   }), [user])
 
   const [form, setForm] = useState(initialForm)

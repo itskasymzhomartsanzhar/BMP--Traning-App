@@ -24,10 +24,13 @@ function AlignmentGrid() {
   )
 }
 
+const TIMER_SECONDS = 10
+
 function PhotoCaptureModal({ onClose, onUploaded }) {
   const videoRef = useRef(null)
   const streamRef = useRef(null)
   const fileInputRef = useRef(null)
+  const countdownRef = useRef(null)
 
   // camera | preview | no-camera
   const [phase, setPhase] = useState('no-camera')
@@ -35,13 +38,16 @@ function PhotoCaptureModal({ onClose, onUploaded }) {
   const [blob, setBlob] = useState(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  // null — таймер не идёт; число — сколько секунд осталось до снимка.
+  const [countdown, setCountdown] = useState(null)
 
   useEffect(() => {
     let cancelled = false
     if (!navigator.mediaDevices?.getUserMedia) return undefined
 
     navigator.mediaDevices
-      .getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1080 }, height: { ideal: 1920 } } })
+      // Фронтальная камера: человек видит себя и успевает встать по сетке.
+      .getUserMedia({ video: { facingMode: 'user', width: { ideal: 1080 }, height: { ideal: 1920 } } })
       .then((stream) => {
         if (cancelled) {
           stream.getTracks().forEach((t) => t.stop())
@@ -57,6 +63,7 @@ function PhotoCaptureModal({ onClose, onUploaded }) {
     return () => {
       cancelled = true
       streamRef.current?.getTracks().forEach((t) => t.stop())
+      window.clearInterval(countdownRef.current)
     }
   }, [])
 
@@ -73,7 +80,11 @@ function PhotoCaptureModal({ onClose, onUploaded }) {
     const canvas = document.createElement('canvas')
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
-    canvas.getContext('2d').drawImage(video, 0, 0)
+    const ctx = canvas.getContext('2d')
+    // Кадр зеркалим, как и превью фронталки — что видел, то и получил.
+    ctx.translate(canvas.width, 0)
+    ctx.scale(-1, 1)
+    ctx.drawImage(video, 0, 0)
     canvas.toBlob(
       (shot) => {
         if (!shot) return
@@ -84,6 +95,27 @@ function PhotoCaptureModal({ onClose, onUploaded }) {
       'image/jpeg',
       0.92,
     )
+  }
+
+  // Таймер 10 секунд: человек успевает отойти и встать по сетке.
+  const startCountdown = () => {
+    setCountdown(TIMER_SECONDS)
+    countdownRef.current = window.setInterval(() => {
+      setCountdown((prev) => {
+        if (prev === null) return null
+        if (prev <= 1) {
+          window.clearInterval(countdownRef.current)
+          takeShot()
+          return null
+        }
+        return prev - 1
+      })
+    }, 1000)
+  }
+
+  const cancelCountdown = () => {
+    window.clearInterval(countdownRef.current)
+    setCountdown(null)
   }
 
   const pickFile = (event) => {
@@ -136,7 +168,10 @@ function PhotoCaptureModal({ onClose, onUploaded }) {
 
         <div className="pcap-frame">
           {phase === 'camera' && (
-            <video ref={videoRef} className="pcap-media" autoPlay playsInline muted />
+            <video ref={videoRef} className="pcap-media pcap-media--mirror" autoPlay playsInline muted />
+          )}
+          {countdown !== null && (
+            <div className="pcap-countdown" aria-live="assertive">{countdown}</div>
           )}
           {phase === 'preview' && (
             <img className="pcap-media" src={previewUrl} alt="Проверьте кадр по сетке" />
@@ -153,15 +188,21 @@ function PhotoCaptureModal({ onClose, onUploaded }) {
         {error && <p className="pcap-error">{error}</p>}
 
         <div className="pcap-actions">
-          {phase === 'camera' && (
+          {phase === 'camera' && countdown === null && (
             <>
               <button type="button" className="secondary" onClick={() => fileInputRef.current?.click()}>
                 <FaImage aria-hidden="true" /> Галерея
               </button>
-              <button type="button" className="primary" onClick={takeShot}>
-                <FaCamera aria-hidden="true" /> Снимок
+              <button type="button" className="primary" onClick={startCountdown}>
+                <FaCamera aria-hidden="true" /> Снимок через {TIMER_SECONDS} сек
               </button>
             </>
+          )}
+
+          {phase === 'camera' && countdown !== null && (
+            <button type="button" className="secondary pcap-cancel-timer" onClick={cancelCountdown}>
+              Отменить таймер
+            </button>
           )}
 
           {phase === 'no-camera' && (

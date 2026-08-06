@@ -15,7 +15,7 @@ import './ProfilePage.scss'
 
 function ProfilePage() {
   const navigate = useNavigate()
-  const { showPremium, showCalculator, userProfile, updateUserProfile, t } = useAppUI()
+  const { showPremium, userProfile, updateUserProfile, t } = useAppUI()
 
   // Уведомления живут в SettingsCard, где тумблеры реально сохраняются.
   const profileActions = [
@@ -38,7 +38,7 @@ function ProfilePage() {
     const mapped = {
       display_name: nextUser.name,
       gender: { 'Мужской': 'male', 'Женский': 'female' }[nextUser.gender] || nextUser.gender,
-      goal: { 'Сушка': 'cut', 'Набор массы': 'bulk', 'Поддержание': 'maintain', 'Выносливость': 'endurance', 'Рекомпозиция': 'recomp' }[nextUser.goal] || nextUser.goal,
+      goal: { 'Сушка': 'cut', 'Рекомп': 'recomp', 'Набор': 'bulk' }[nextUser.goal] || nextUser.goal,
     }
     updateUserProfile(mapped)
     setPersonalModalOpen(false)
@@ -63,10 +63,6 @@ function ProfilePage() {
       <div className="profile-extra-links card animate-in delay-2">
         <button type="button" className="profile-row" onClick={() => navigate('/nutrition')}>
           <span>{t('profile.nutrition')}</span>
-          <strong>{t('common.open')}</strong>
-        </button>
-        <button type="button" className="profile-row" onClick={showCalculator}>
-          <span>{t('profile.calculator')}</span>
           <strong>{t('common.open')}</strong>
         </button>
       </div>

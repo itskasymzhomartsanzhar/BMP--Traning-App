@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useAppUI } from '../../context/AppUIContext'
 import BackHeader from '../../components/organisms/BackHeader/BackHeader'
 import { getArticle } from '../../api/articles'
 import './ArticlePage.scss'
 
 function ArticlePage() {
+  const { t } = useAppUI()
   const { articleId } = useParams()
   const navigate = useNavigate()
   const [article, setArticle] = useState(null)
@@ -19,7 +21,7 @@ function ArticlePage() {
   if (notFound) {
     return (
       <section className="page">
-        <BackHeader title="Статья не найдена" onBack={() => navigate('/knowledge')} />
+        <BackHeader title={t('knowledge.articleNotFound')} onBack={() => navigate('/knowledge')} />
       </section>
     )
   }
@@ -27,7 +29,7 @@ function ArticlePage() {
   if (!article) {
     return (
       <section className="page page-article">
-        <BackHeader title="Загрузка..." onBack={() => navigate('/knowledge')} />
+        <BackHeader title={t('common.loading')} onBack={() => navigate('/knowledge')} />
       </section>
     )
   }

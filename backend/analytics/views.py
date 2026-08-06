@@ -13,36 +13,107 @@ DAY_KEYS = {0: 'mon', 1: 'tue', 2: 'wed', 3: 'thu', 4: 'fri', 5: 'sat', 6: 'sun'
 
 
 class ActivityView(APIView):
+    """Активность недели: столбик дня = тренировка (50%) + питание (50%).
+
+    Питание считается выполненным, когда достигнута дневная цель по воде —
+    это единственный ежедневный трекинг питания в приложении.
+    """
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        from django.db.models import Count, F
+        from nutrition.models import NutritionDay
+
         today = date.today()
         week_start = today - timedelta(days=today.weekday())
         week_end = week_start + timedelta(days=6)
 
-        sessions = WorkoutSession.objects.filter(
-            user=request.user,
-            status='completed',
-            started_at__date__gte=week_start,
-            started_at__date__lte=week_end,
+        # Два агрегированных запроса на неделю вместо перебора по дням.
+        workout_counts = dict(
+            WorkoutSession.objects.filter(
+                user=request.user,
+                status='completed',
+                started_at__date__gte=week_start,
+                started_at__date__lte=week_end,
+            )
+            .values('started_at__date')
+            .annotate(n=Count('id'))
+            .values_list('started_at__date', 'n')
         )
-
-        counts = {}
-        for session in sessions:
-            d = session.started_at.date()
-            counts[d] = counts.get(d, 0) + 1
+        nutrition_dates = set(
+            NutritionDay.objects.filter(
+                user=request.user,
+                date__gte=week_start,
+                date__lte=week_end,
+                target_water_liters__gt=0,
+                water_liters__gte=F('target_water_liters'),
+            ).values_list('date', flat=True)
+        )
 
         result = []
         for i in range(7):
             d = week_start + timedelta(days=i)
+            workouts = workout_counts.get(d, 0)
+            workout_done = workouts > 0
+            nutrition_done = d in nutrition_dates
             result.append({
                 'day': DAY_LABELS[i],
                 'key': DAY_KEYS[i],
                 'date': str(d),
-                'value': counts.get(d, 0),
+                'workouts': workouts,
+                'workout_done': workout_done,
+                'nutrition_done': nutrition_done,
+                'percent': (50 if workout_done else 0) + (50 if nutrition_done else 0),
+                # Старое поле: количество тренировок, его ждёт прошлая сборка фронта.
+                'value': workouts,
             })
 
         return Response(result)
+
+
+class CalendarView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        month_param = request.query_params.get('month', date.today().strftime('%Y-%m'))
+        try:
+            month_start = date.fromisoformat(f'{month_param}-01')
+        except ValueError:
+            from rest_framework import status
+            return Response({'detail': 'Invalid month format, use YYYY-MM'}, status=status.HTTP_400_BAD_REQUEST)
+
+        next_month = (month_start.replace(day=28) + timedelta(days=4)).replace(day=1)
+        user = request.user
+        days = {}
+
+        def day_entry(d):
+            return days.setdefault(str(d), {'workouts': [], 'water': None, 'weight': None})
+
+        sessions = (
+            WorkoutSession.objects
+            .filter(user=user, status='completed', started_at__date__gte=month_start, started_at__date__lt=next_month)
+            .select_related('workout')
+            .order_by('started_at')
+        )
+        for session in sessions:
+            day_entry(session.started_at.date())['workouts'].append({
+                'title': session.workout.title if session.workout else 'Тренировка',
+                'minutes': round(session.elapsed_seconds / 60),
+                'calories': session.workout.calories if session.workout else None,
+            })
+
+        from nutrition.models import NutritionDay
+        nutrition_days = NutritionDay.objects.filter(user=user, date__gte=month_start, date__lt=next_month, water_liters__gt=0)
+        for nd in nutrition_days:
+            day_entry(nd.date)['water'] = {'current': nd.water_liters, 'target': nd.target_water_liters}
+
+        from analytics.models import WeightEntry
+        entries = WeightEntry.objects.filter(user=user, recorded_at__gte=month_start, recorded_at__lt=next_month)
+        for e in entries:
+            day_entry(e.recorded_at)['weight'] = e.value
+
+        return Response({'month': month_start.strftime('%Y-%m'), 'days': days})
 
 
 class StreakView(APIView):

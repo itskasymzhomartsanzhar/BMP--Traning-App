@@ -13,7 +13,7 @@ const DEFAULT_WORKOUT_ID = 'gym-fullbody'
 
 function HomePage() {
   const navigate = useNavigate()
-  const { showInfo, showTrainingDays, userProfile, authReady, t } = useAppUI()
+  const { showInfo, showTrainingDays, userProfile, authReady, t, u } = useAppUI()
   const [dashboard, setDashboard] = useState(null)
   const [selectedDayId, setSelectedDayId] = useState(null)
 
@@ -31,9 +31,8 @@ function HomePage() {
   }
 
   const stats = dashboard?.stats
-  const kg = t('stats.kg')
   const homeStats = [
-    { id: 'weight', label: t('home.statWeight'), value: stats?.current_weight_kg ? `${stats.current_weight_kg} ${kg}` : (userProfile?.weight ? `${userProfile.weight} ${kg}` : '—') },
+    { id: 'weight', label: t('home.statWeight'), value: stats?.current_weight_kg ? u.fmtWeight(stats.current_weight_kg) : (userProfile?.weight ? u.fmtWeight(userProfile.weight) : '—') },
     { id: 'workouts', label: t('home.statWorkouts'), value: String(stats?.total_workouts ?? userProfile?.workout_count ?? 0) },
     { id: 'activity', label: t('home.statActivity'), value: `${stats?.activity_days ?? 0} ${t('home.daysSuffix')}` },
   ]
@@ -46,7 +45,7 @@ function HomePage() {
   const selectedPlan = selectedDay
     ? (selectedDay.plan ?? [])
     : (dashboard?.today_plan ?? [])
-  const userName = userProfile?.name || userProfile?.display_name || userProfile?.first_name || 'друг'
+  const userName = userProfile?.name || userProfile?.display_name || userProfile?.first_name || t('home.friend')
 
   const planTitle = !selectedDay || selectedDay.is_today
     ? t('home.planToday')

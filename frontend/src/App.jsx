@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AppUIProvider } from './context/AppUIContext'
 import AuthGate from './components/common/AuthGate'
+import TelegramBackButton from './components/common/TelegramBackButton'
 import MainLayout from './layouts/MainLayout'
 import FlowLayout from './layouts/FlowLayout'
 import LandingPage from './pages/LandingPage/LandingPage'
@@ -8,6 +9,7 @@ import WelcomePage from './pages/AuthPages/WelcomePage'
 import LoginPage from './pages/AuthPages/LoginPage'
 import RegisterPage from './pages/AuthPages/RegisterPage'
 import OnboardingPage from './pages/OnboardingPage/OnboardingPage'
+import PremiumPage from './pages/PremiumPage/PremiumPage'
 import HomePage from './pages/HomePage/HomePage'
 import TrainingsPage from './pages/TrainingsPage/TrainingsPage'
 import NutritionPage from './pages/NutritionPage/NutritionPage'
@@ -25,6 +27,7 @@ function App() {
   return (
     <AppUIProvider>
       <BrowserRouter>
+        <TelegramBackButton />
         <AuthGate>
           <Routes>
             <Route path="landing" element={<LandingPage />} />
@@ -32,6 +35,7 @@ function App() {
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="onboarding" element={<OnboardingPage />} />
+            <Route path="premium" element={<PremiumPage />} />
 
             <Route element={<MainLayout />}>
               <Route index element={<HomePage />} />

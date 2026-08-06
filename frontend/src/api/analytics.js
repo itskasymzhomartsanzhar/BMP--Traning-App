@@ -2,6 +2,8 @@ import client from './client'
 
 export const getActivity = () => client.get('/analytics/activity/')
 export const getStreak = () => client.get('/analytics/streak/')
+export const getCalendarMonth = (month) =>
+  client.get('/analytics/calendar/', { params: { month } })
 export const getWeightHistory = () => client.get('/analytics/weight/')
 export const addWeight = (value, date) =>
   client.post('/analytics/weight/', { value, recorded_at: date })

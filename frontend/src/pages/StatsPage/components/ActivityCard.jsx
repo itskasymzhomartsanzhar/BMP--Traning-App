@@ -1,5 +1,9 @@
 import { useAppUI } from '../../../context/AppUIContext'
 
+/**
+ * Столбик дня — из двух равных половин: нижняя за завершённую тренировку,
+ * верхняя за питание (цель по воде). Обе есть — столбик полный.
+ */
 function ActivityCard({ items, onDayClick }) {
   const { t } = useAppUI()
   return (
@@ -13,10 +17,17 @@ function ActivityCard({ items, onDayClick }) {
             className="bar-item"
             onClick={() => onDayClick?.(item)}
           >
-            <span className="bar" style={{ height: `${item.value * 22}px` }} />
+            <span className="bar-track">
+              {item.nutrition_done ? <i className="bar-seg bar-seg--nutrition" /> : null}
+              {item.workout_done ? <i className="bar-seg bar-seg--workout" /> : null}
+            </span>
             <small>{item.day}</small>
           </button>
         ))}
+      </div>
+      <div className="activity-legend">
+        <span><i className="legend-dot legend-dot--workout" />{t('stats.legendWorkout')}</span>
+        <span><i className="legend-dot legend-dot--nutrition" />{t('stats.legendNutrition')}</span>
       </div>
     </div>
   )

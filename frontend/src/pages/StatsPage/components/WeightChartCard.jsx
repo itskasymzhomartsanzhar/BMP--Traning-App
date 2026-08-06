@@ -1,7 +1,7 @@
 import { useAppUI } from '../../../context/AppUIContext'
 
 function WeightChartCard({ points }) {
-  const { t } = useAppUI()
+  const { t, u } = useAppUI()
   const width = 320
   const height = 180
   const padding = 14
@@ -9,7 +9,7 @@ function WeightChartCard({ points }) {
   if (points.length === 0) {
     return (
       <div className="card chart-card animate-in delay-2">
-        <h2>{t('stats.weightChart')}</h2>
+        <h2>{t('stats.weightChart', { unit: u.weightLabel })}</h2>
         <p className="chart-card__empty">{t('stats.weightChartEmpty')}</p>
       </div>
     )
@@ -31,7 +31,7 @@ function WeightChartCard({ points }) {
 
   return (
     <div className="card chart-card animate-in delay-2">
-      <h2>Вес (кг)</h2>
+      <h2>{t('stats.weightChart', { unit: u.weightLabel })}</h2>
 
       <div className="chart-wrapper">
         <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="График изменения веса">
@@ -69,7 +69,7 @@ function WeightChartCard({ points }) {
           ))}
         </div>
 
-        <p className="chart-value">Текущий вес: {points[points.length - 1]?.value ?? 0} кг</p>
+        <p className="chart-value">{t('stats.currentWeight', { value: u.fmtWeight(points[points.length - 1]?.value ?? 0) })}</p>
       </div>
     </div>
   )

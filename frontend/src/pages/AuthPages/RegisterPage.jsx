@@ -10,7 +10,7 @@ import './AuthPages.scss'
 // Флоу регистрации: опрос → показ плана → почта и пароль → сразу в тренировку.
 function RegisterPage() {
   const navigate = useNavigate()
-  const { registerWithEmail, isAuthenticated } = useAppUI()
+  const { registerWithEmail, isAuthenticated, t } = useAppUI()
 
   const [phase, setPhase] = useState('quiz') // quiz | plan | account
   const [anketa, setAnketa] = useState(null)
@@ -58,10 +58,10 @@ function RegisterPage() {
       <OnboardingResult
         recommendation={recommendation}
         userName={userName}
-        startLabel="Начать"
+        startLabel={t('common.start')}
         onStart={() => setPhase('account')}
         onSkip={recommendation?.program ? null : () => setPhase('account')}
-        skipLabel="Продолжить"
+        skipLabel={t('onb.continue')}
       />
     )
   }
@@ -70,15 +70,15 @@ function RegisterPage() {
     event.preventDefault()
     const cleanEmail = email.trim()
     if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
-      setError('Введите корректную почту.')
+      setError(t('onb.errEmailInvalid'))
       return
     }
     if (password.length < 8) {
-      setError('Пароль должен быть не короче 8 символов.')
+      setError(t('onb.errPassword8'))
       return
     }
     if (password !== password2) {
-      setError('Пароли не совпадают.')
+      setError(t('auth.passwordsMismatch'))
       return
     }
 
@@ -92,7 +92,7 @@ function RegisterPage() {
       .catch((err) => {
         const detail = err.response?.data
         const first = detail && typeof detail === 'object' ? Object.values(detail).flat()[0] : null
-        setError(first ? String(first) : 'Не удалось создать аккаунт. Попробуйте ещё раз.')
+        setError(first ? String(first) : t('auth.registerError'))
       })
       .finally(() => setSaving(false))
   }
@@ -104,23 +104,23 @@ function RegisterPage() {
       <div className="auth-page__content">
         <form className="auth-form" onSubmit={submit} noValidate>
           <div className="auth-form__head">
-            <button type="button" className="auth-form__back" onClick={() => setPhase(recommendation ? 'plan' : 'quiz')} aria-label="Назад">
+            <button type="button" className="auth-form__back" onClick={() => setPhase(recommendation ? 'plan' : 'quiz')} aria-label={t('common.back')}>
               <FaArrowLeft />
             </button>
           </div>
 
-          <h1 className="auth-form__title">Почти готово</h1>
-          <p className="auth-form__subtitle">Создайте аккаунт, чтобы сохранить план и начать тренировку.</p>
+          <h1 className="auth-form__title">{t('auth.almostDone')}</h1>
+          <p className="auth-form__subtitle">{t('auth.almostDoneSub')}</p>
 
           {recommendation?.program && (
             <div className="auth-plan-note">
-              Ваш план: <strong>{recommendation.program.title}</strong> · {recommendation.reason}
+              {t('auth.yourPlan')} <strong>{recommendation.program.title}</strong> · {recommendation.reason}
             </div>
           )}
 
           <div className="auth-form__fields">
             <label className="auth-form__field">
-              Почта
+              {t('onb.email')}
               <input
                 type="email"
                 autoComplete="email"
@@ -132,7 +132,7 @@ function RegisterPage() {
             </label>
 
             <label className="auth-form__field">
-              Пароль (минимум 8 символов)
+              {t('auth.passwordMin8')}
               <input
                 type="password"
                 autoComplete="new-password"
@@ -144,7 +144,7 @@ function RegisterPage() {
             </label>
 
             <label className="auth-form__field">
-              Повторите пароль
+              {t('auth.repeatPassword')}
               <input
                 type="password"
                 autoComplete="new-password"
@@ -160,12 +160,12 @@ function RegisterPage() {
 
           <div className="auth-form__foot">
             <button type="submit" className="auth-actions__primary" disabled={saving}>
-              {saving ? 'Создаём аккаунт…' : 'Зарегистрироваться и начать'}
+              {saving ? t('auth.creatingAccount') : t('auth.registerAndStart')}
             </button>
 
             <p className="auth-form__switch">
-              Уже есть аккаунт?{' '}
-              <button type="button" onClick={() => navigate('/login')}>Войти</button>
+              {t('auth.haveAccount')}{' '}
+              <button type="button" onClick={() => navigate('/login')}>{t('auth.signIn')}</button>
             </p>
           </div>
         </form>

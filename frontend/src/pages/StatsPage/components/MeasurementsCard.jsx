@@ -7,8 +7,19 @@ const FIELD_KEYS = {
   hip_cm: 'stats.hips',
 }
 
+// Бэкенд отдаёт значения строками в метрике («100 см», «97 кг», «19.3%») —
+// парсим число и форматируем в выбранной системе измерения.
+function formatValue(item, u) {
+  const num = parseFloat(String(item.value).replace(',', '.'))
+  if (!Number.isFinite(num)) return item.value
+  if (item.field === 'body_fat_percent') return `${num}%`
+  if (item.field === 'weight' || item.field === 'muscle_mass') return u.fmtWeight(num)
+  if (String(item.field).endsWith('_cm')) return u.fmtLength(num)
+  return item.value
+}
+
 function MeasurementsCard({ measurements, onEdit }) {
-  const { t } = useAppUI()
+  const { t, u } = useAppUI()
   const hasData = measurements.length > 0
 
   return (
@@ -26,7 +37,7 @@ function MeasurementsCard({ measurements, onEdit }) {
           {measurements.map((item) => (
             <div key={item.label} className="param-row">
               <span>{FIELD_KEYS[item.field] ? t(FIELD_KEYS[item.field]) : item.label}</span>
-              <strong>{String(item.value).replace(' см', ` ${t('stats.cm')}`).replace(' кг', ` ${t('stats.kg')}`)}</strong>
+              <strong>{formatValue(item, u)}</strong>
             </div>
           ))}
         </div>

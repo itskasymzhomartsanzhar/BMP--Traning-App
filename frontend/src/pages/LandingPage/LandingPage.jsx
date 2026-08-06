@@ -1,15 +1,17 @@
 import { Navigate, useNavigate } from 'react-router-dom'
-import { useAppUI } from '../../context/AppUIContext'
+import { useAppUI, isTelegramMiniApp } from '../../context/AppUIContext'
 import personImg from '../../assets/person.webp'
 import logoImg from '../../assets/logo-mark.png'
 import './LandingPage.scss'
 
-// Брендовый лендинг — первый экран для гостя в браузере.
+// Брендовый лендинг: первый экран для гостя в браузере и для нового
+// пользователя мини-аппа (он уже авторизован по initData, но опрос не прошёл).
 function LandingPage() {
   const navigate = useNavigate()
-  const { isAuthenticated } = useAppUI()
+  const { isAuthenticated, isOnboarded } = useAppUI()
+  const miniApp = isTelegramMiniApp()
 
-  if (isAuthenticated) return <Navigate to="/" replace />
+  if (isAuthenticated && (!miniApp || isOnboarded)) return <Navigate to="/" replace />
 
   return (
     <section className="landing">
@@ -22,7 +24,7 @@ function LandingPage() {
       </div>
 
       <nav className="landing__menu">
-        <button type="button" className="landing__item landing__item--active" onClick={() => navigate('/welcome')}>
+        <button type="button" className="landing__item landing__item--active" onClick={() => navigate(miniApp ? '/onboarding' : '/welcome')}>
           TRAINING APP
         </button>
         <span className="landing__item landing__item--soon">

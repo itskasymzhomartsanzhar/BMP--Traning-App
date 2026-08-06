@@ -1,7 +1,7 @@
-import { FaCrown, FaFireFlameSimple } from 'react-icons/fa6'
+import { FaFireFlameSimple, FaRegCalendarDays } from 'react-icons/fa6'
 import logoMark from '../../assets/logo-mark.png'
 
-function TopStatus({ streak = 0, onStreakClick, onPremiumClick }) {
+function TopStatus({ streak = 0, onStreakClick, onCalendarClick }) {
   return (
     <header className="top-status">
       <div className="top-status__title">
@@ -15,9 +15,8 @@ function TopStatus({ streak = 0, onStreakClick, onPremiumClick }) {
           <span className="streak-button__count">{streak}</span>
         </button>
 
-        <button type="button" className="premium-button" aria-label="Premium" onClick={onPremiumClick}>
-          <FaCrown aria-hidden="true" />
-          <span>Premium</span>
+        <button type="button" className="calendar-button" aria-label="Календарь" onClick={onCalendarClick}>
+          <FaRegCalendarDays aria-hidden="true" />
         </button>
       </div>
     </header>

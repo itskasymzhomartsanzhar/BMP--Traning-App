@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { FaArrowLeft, FaCheck } from 'react-icons/fa6'
+import { useAppUI } from '../../context/AppUIContext'
 import {
   GENDER_OPTIONS, GOAL_OPTIONS, LEVEL_OPTIONS, PLACE_OPTIONS, INJURY_OPTIONS,
   DAY_OPTIONS, DAYS_BY_LEVEL, stepsForForm, isCustomProgram, calcAge, validateStep, buildPayload,
@@ -21,13 +22,13 @@ const INITIAL_FORM = {
   password: '',
 }
 
-function extractApiError(error) {
+function extractApiError(error, t) {
   const detail = error.response?.data
   if (detail && typeof detail === 'object') {
     const first = Object.values(detail).flat()[0]
     if (first) return String(first)
   }
-  return 'Не удалось сохранить. Попробуйте ещё раз.'
+  return t('onb.saveError')
 }
 
 /**
@@ -35,7 +36,9 @@ function extractApiError(error) {
  * возвращает промис — авторизованный флоу шлёт анкету в профиль,
  * гостевой — на превью плана.
  */
-function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBackFromFirst, submitLabel = 'Подобрать план' }) {
+function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBackFromFirst, submitLabel = null }) {
+  const { t } = useAppUI()
+  const weekdays = t('calendar.weekdays').split(',')
   const [stepIndex, setStepIndex] = useState(0)
   const [form, setForm] = useState(() => ({ ...INITIAL_FORM, name: initialName }))
   const [errors, setErrors] = useState({})
@@ -94,7 +97,7 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
   }
 
   const goNext = () => {
-    const stepErrors = validateStep(step, form)
+    const stepErrors = validateStep(step, form, t)
     if (Object.keys(stepErrors).length > 0) {
       setErrors(stepErrors)
       return
@@ -109,7 +112,7 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
     }
     setSaving(true)
     onSubmit(buildPayload(form), form)
-      .catch((error) => setErrors({ submit: extractApiError(error) }))
+      .catch((error) => setErrors({ submit: extractApiError(error, t) }))
       .finally(() => setSaving(false))
   }
 
@@ -122,7 +125,7 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
 
       <header className="onb__head">
         {showBack ? (
-          <button type="button" className="onb__back" onClick={goBack} aria-label="Назад">
+          <button type="button" className="onb__back" onClick={goBack} aria-label={t('common.back')}>
             <FaArrowLeft />
           </button>
         ) : <span className="onb__back-placeholder" />}
@@ -136,13 +139,13 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
       <div className="onb__body" key={step}>
         {step === 'name' && (
           <div className="onb__step">
-            <h1 className="onb__title">Знакомимся</h1>
-            <p className="onb__subtitle">Как к вам обращаться в приложении?</p>
+            <h1 className="onb__title">{t('onb.stepName')}</h1>
+            <p className="onb__subtitle">{t('onb.stepNameSub')}</p>
             <input
               className="onb__input"
               type="text"
               autoFocus
-              placeholder="Ваше имя"
+              placeholder={t('onb.namePlaceholder')}
               value={form.name}
               onChange={(e) => setField('name', e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && goNext()}
@@ -154,8 +157,8 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
 
         {step === 'birth' && (
           <div className="onb__step">
-            <h1 className="onb__title">Дата рождения</h1>
-            <p className="onb__subtitle">Возраст влияет на интенсивность плана.</p>
+            <h1 className="onb__title">{t('onb.stepBirth')}</h1>
+            <p className="onb__subtitle">{t('onb.stepBirthSub')}</p>
             <input
               className="onb__input"
               type="date"
@@ -165,7 +168,7 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
               aria-invalid={Boolean(errors.birthDate)}
             />
             {age !== null && !errors.birthDate && (
-              <p className="onb__hint">Возраст: <strong>{age}</strong></p>
+              <p className="onb__hint">{t('onb.ageLabel')} <strong>{age}</strong></p>
             )}
             {errors.birthDate && <span className="onb__error">{errors.birthDate}</span>}
           </div>
@@ -173,12 +176,12 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
 
         {step === 'body' && (
           <div className="onb__step">
-            <h1 className="onb__title">Параметры тела</h1>
-            <p className="onb__subtitle">Нужны для расчёта нагрузки и калорий.</p>
+            <h1 className="onb__title">{t('onb.stepBody')}</h1>
+            <p className="onb__subtitle">{t('onb.stepBodySub')}</p>
 
             <div className="onb__row">
               <label className="onb__field">
-                Рост, см
+                {t('onb.heightCm')}
                 <input
                   type="number"
                   inputMode="numeric"
@@ -191,7 +194,7 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
               </label>
 
               <label className="onb__field">
-                Вес, кг
+                {t('onb.weightKg')}
                 <input
                   type="number"
                   inputMode="decimal"
@@ -205,7 +208,7 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
               </label>
             </div>
 
-            <p className="onb__label">Пол</p>
+            <p className="onb__label">{t('profile.gender')}</p>
             <div className="onb__chips">
               {GENDER_OPTIONS.map((o) => (
                 <button
@@ -214,7 +217,7 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
                   className={`onb-chip${form.gender === o.id ? ' is-selected' : ''}`}
                   onClick={() => setField('gender', o.id)}
                 >
-                  {o.label}
+                  {t(o.labelKey)}
                 </button>
               ))}
             </div>
@@ -224,8 +227,8 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
 
         {step === 'goal' && (
           <div className="onb__step">
-            <h1 className="onb__title">Ваша цель</h1>
-            <p className="onb__subtitle">По ней подберём программу.</p>
+            <h1 className="onb__title">{t('onb.stepGoal')}</h1>
+            <p className="onb__subtitle">{t('onb.stepGoalSub')}</p>
             <div className="onb__cards">
               {GOAL_OPTIONS.map((o) => (
                 <button
@@ -234,8 +237,8 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
                   className={`onb-card${form.goal === o.id ? ' is-selected' : ''}`}
                   onClick={() => setField('goal', o.id)}
                 >
-                  <span className="onb-card__label">{o.label}</span>
-                  <span className="onb-card__hint">{o.hint}</span>
+                  <span className="onb-card__label">{t(o.labelKey)}</span>
+                  <span className="onb-card__hint">{t(o.hintKey)}</span>
                   {form.goal === o.id && <FaCheck className="onb-card__check" />}
                 </button>
               ))}
@@ -246,10 +249,10 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
 
         {step === 'level' && (
           <div className="onb__step">
-            <h1 className="onb__title">Опыт и место</h1>
-            <p className="onb__subtitle">Чтобы старт был по силам.</p>
+            <h1 className="onb__title">{t('onb.stepLevel')}</h1>
+            <p className="onb__subtitle">{t('onb.stepLevelSub')}</p>
 
-            <p className="onb__label">Уровень подготовки</p>
+            <p className="onb__label">{t('onb.levelLabel')}</p>
             <div className="onb__cards">
               {LEVEL_OPTIONS.map((o) => (
                 <button
@@ -258,8 +261,8 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
                   className={`onb-card${form.level === o.id ? ' is-selected' : ''}`}
                   onClick={() => setField('level', o.id)}
                 >
-                  <span className="onb-card__label">{o.label}</span>
-                  <span className="onb-card__hint">{o.hint}</span>
+                  <span className="onb-card__label">{t(o.labelKey)}</span>
+                  <span className="onb-card__hint">{t(o.hintKey)}</span>
                   {form.level === o.id && <FaCheck className="onb-card__check" />}
                 </button>
               ))}
@@ -267,12 +270,10 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
             {errors.level && <span className="onb__error">{errors.level}</span>}
 
             {custom ? (
-              <p className="onb__hint">
-                Без готового плана: вы сами выберете упражнения и дни тренировок в приложении.
-              </p>
+              <p className="onb__hint">{t('onb.customHint')}</p>
             ) : (
               <>
-                <p className="onb__label">Где тренируетесь</p>
+                <p className="onb__label">{t('onb.placeLabel')}</p>
                 <div className="onb__chips">
                   {PLACE_OPTIONS.map((o) => (
                     <button
@@ -281,7 +282,7 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
                       className={`onb-chip${form.place === o.id ? ' is-selected' : ''}`}
                       onClick={() => setField('place', o.id)}
                     >
-                      {o.label}
+                      {t(o.labelKey)}
                     </button>
                   ))}
                 </div>
@@ -294,8 +295,8 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
 
         {step === 'injuries' && (
           <div className="onb__step">
-            <h1 className="onb__title">Травмы и ограничения</h1>
-            <p className="onb__subtitle">Исключим опасные для вас упражнения. Можно выбрать несколько.</p>
+            <h1 className="onb__title">{t('onb.stepInjuries')}</h1>
+            <p className="onb__subtitle">{t('onb.stepInjuriesSub')}</p>
             <div className="onb__cards onb__cards--compact">
               {INJURY_OPTIONS.map((o) => (
                 <button
@@ -304,7 +305,7 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
                   className={`onb-card onb-card--row${form.injuries.includes(o.id) ? ' is-selected' : ''}`}
                   onClick={() => toggleInjury(o.id)}
                 >
-                  <span className="onb-card__label">{o.label}</span>
+                  <span className="onb-card__label">{t(o.labelKey)}</span>
                   {form.injuries.includes(o.id) && <FaCheck className="onb-card__check" />}
                 </button>
               ))}
@@ -314,10 +315,10 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
 
         {step === 'account' && (
           <div className="onb__step">
-            <h1 className="onb__title">Данные для входа</h1>
-            <p className="onb__subtitle">Почта и пароль — чтобы входить в аккаунт и без Telegram.</p>
+            <h1 className="onb__title">{t('onb.stepAccount')}</h1>
+            <p className="onb__subtitle">{t('onb.stepAccountSub')}</p>
             <label className="onb__field">
-              Почта
+              {t('onb.email')}
               <input
                 type="email"
                 inputMode="email"
@@ -330,11 +331,11 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
               {errors.email && <span className="onb__error">{errors.email}</span>}
             </label>
             <label className="onb__field">
-              Пароль
+              {t('onb.password')}
               <input
                 type="password"
                 autoComplete="new-password"
-                placeholder="Минимум 8 символов"
+                placeholder={t('onb.passwordPlaceholder')}
                 value={form.password}
                 onChange={(e) => setField('password', e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && goNext()}
@@ -348,20 +349,20 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
 
         {step === 'days' && (
           <div className="onb__step">
-            <h1 className="onb__title">Дни тренировок</h1>
+            <h1 className="onb__title">{t('onb.stepDays')}</h1>
             <p className="onb__subtitle">
-              Мы отметили дни под ваш уровень — поменяйте, как удобно.
-              Выбрано: <strong>{form.trainingDays.length}</strong> в неделю.
+              {t('onb.stepDaysSub')}{' '}
+              {t('onb.daysSelected', { count: form.trainingDays.length })}
             </p>
             <div className="onb__chips onb__chips--days">
-              {DAY_OPTIONS.map((day) => (
+              {DAY_OPTIONS.map((day, dayIndex) => (
                 <button
                   key={day.id}
                   type="button"
                   className={`onb-chip${form.trainingDays.includes(day.id) ? ' is-selected' : ''}`}
                   onClick={() => toggleDay(day.id)}
                 >
-                  {day.label}
+                  {weekdays[dayIndex]}
                 </button>
               ))}
             </div>
@@ -383,10 +384,10 @@ function OnboardingWizard({ initialName = '', askAccount = false, onSubmit, onBa
           }
         >
           {saving
-            ? (custom ? 'Сохраняем…' : 'Подбираем план…')
+            ? (custom ? t('stats.saving') : t('onb.pickingPlan'))
             : isLastStep
-              ? (custom ? 'Продолжить' : submitLabel)
-              : 'Далее'}
+              ? (custom ? t('onb.continue') : (submitLabel || t('onb.submit')))
+              : t('onb.next')}
         </button>
       </footer>
     </section>

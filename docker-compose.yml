@@ -43,6 +43,26 @@ services:
       db:
         condition: service_healthy
 
+  # Telegram-бот: /start c кнопкой Mini App + ежедневные пуш-напоминания.
+  bot:
+    build: ./backend
+    restart: unless-stopped
+    command: python main.py
+    environment:
+      SECRET_KEY: ${SECRET_KEY:?Задайте SECRET_KEY в .env}
+      DEBUG: "False"
+      POSTGRES_DB: ${POSTGRES_DB:-tres}
+      POSTGRES_USER: ${POSTGRES_USER:-tres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TG_WEBAPP_URL: ${TG_WEBAPP_URL:-https://tresfit.ru}
+      TG_REMINDER_HOUR: ${TG_REMINDER_HOUR:-9}
+    depends_on:
+      db:
+        condition: service_healthy
+
   nginx:
     build:
       context: .

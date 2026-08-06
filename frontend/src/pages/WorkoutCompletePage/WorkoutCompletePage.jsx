@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { FaTrophy, FaFire, FaClock, FaDumbbell } from 'react-icons/fa6'
+import { useAppUI } from '../../context/AppUIContext'
 import { completeSession } from '../../api/workouts'
 import './WorkoutCompletePage.scss'
 
 function WorkoutCompletePage() {
+  const { t } = useAppUI()
   const { programId } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
@@ -28,10 +30,10 @@ function WorkoutCompletePage() {
       <section className="page page-workout-complete">
         <div className="complete-hero card animate-in">
           <div className="complete-hero__icon"><FaTrophy /></div>
-          <h1>Тренировка завершена!</h1>
+          <h1>{t('workout.completedTitle')}</h1>
         </div>
         <button type="button" className="primary animate-in" onClick={() => navigate('/')}>
-          На главную
+          {t('workout.toHome')}
         </button>
       </section>
     )
@@ -43,27 +45,27 @@ function WorkoutCompletePage() {
         <div className="complete-hero__icon">
           <FaTrophy />
         </div>
-        <h1>Готово!</h1>
+        <h1>{t('workout.doneTitle')}</h1>
         <p>
-          Вы завершили «{workout.title}».<br />
-          Отличная работа — {workout.exercises.length} упражнений выполнено.
+          {t('workout.completedProgram', { title: workout.title })}<br />
+          {t('workout.greatJob', { count: workout.exercises.length })}
         </p>
       </div>
 
       <div className="complete-stats card animate-in delay-1">
         <div className="complete-stats__item">
           <FaClock className="complete-stats__icon" />
-          <span>Длительность</span>
+          <span>{t('workout.duration')}</span>
           <strong>{workout.duration}</strong>
         </div>
         <div className="complete-stats__item">
           <FaFire className="complete-stats__icon" />
-          <span>Калории</span>
+          <span>{t('nutrition.calories')}</span>
           <strong>{workout.calories}</strong>
         </div>
         <div className="complete-stats__item">
           <FaDumbbell className="complete-stats__icon" />
-          <span>Упражнений</span>
+          <span>{t('workout.exercises')}</span>
           <strong>{workout.exercises.length}</strong>
         </div>
       </div>
@@ -73,14 +75,14 @@ function WorkoutCompletePage() {
         className="primary animate-in delay-2"
         onClick={() => navigate('/')}
       >
-        На главную
+        {t('workout.toHome')}
       </button>
       <button
         type="button"
         className="secondary animate-in delay-3"
         onClick={() => navigate('/trainings')}
       >
-        Ещё тренировки
+        {t('workout.moreWorkouts')}
       </button>
     </section>
   )

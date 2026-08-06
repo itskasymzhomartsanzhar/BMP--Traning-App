@@ -1,4 +1,7 @@
+import { useAppUI } from '../../../context/AppUIContext'
+
 function TrainingModeTabs({ mode, onChange }) {
+  const { t } = useAppUI()
   return (
     <div className="training-mode-tabs animate-in delay-1">
       <button
@@ -6,7 +9,7 @@ function TrainingModeTabs({ mode, onChange }) {
         className={mode === 'gym' ? 'training-mode-tab is-active' : 'training-mode-tab'}
         onClick={() => onChange('gym')}
       >
-        Тренировка в зале
+        {t('trainings.gymTab')}
       </button>
 
       <button
@@ -14,7 +17,7 @@ function TrainingModeTabs({ mode, onChange }) {
         className={mode === 'home' ? 'training-mode-tab is-active' : 'training-mode-tab'}
         onClick={() => onChange('home')}
       >
-        Дома
+        {t('trainings.homeTab')}
       </button>
     </div>
   )

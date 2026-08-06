@@ -15,7 +15,7 @@ function KnowledgePage() {
   const [search, setSearch] = useState('')
   const [articles, setArticles] = useState([])
   const navigate = useNavigate()
-  const { showModal } = useAppUI()
+  const { showModal, t } = useAppUI()
 
   useEffect(() => {
     const params = {}
@@ -26,12 +26,12 @@ function KnowledgePage() {
 
   return (
     <section className="page page-knowledge">
-      <SectionHead title="База знаний" />
+      <SectionHead title={t('knowledge.title')} />
 
       <div className="knowledge-search">
         <input
           type="search"
-          placeholder="Поиск по статьям..."
+          placeholder={t('knowledge.searchPlaceholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="knowledge-search__input"
@@ -49,10 +49,10 @@ function KnowledgePage() {
 
       {articles.length === 0 ? (
         <div className="card knowledge-empty animate-in">
-          <p>{search ? `Ничего не найдено по запросу «${search}»` : 'Статьи не найдены'}</p>
+          <p>{search ? t('knowledge.nothingFound', { search }) : t('knowledge.noArticles')}</p>
           {search && (
             <button type="button" className="secondary" style={{ marginTop: 10 }} onClick={() => setSearch('')}>
-              Сбросить поиск
+              {t('knowledge.resetSearch')}
             </button>
           )}
         </div>
@@ -63,19 +63,19 @@ function KnowledgePage() {
       <KnowledgeActions
         onFaq={() =>
           showModal({
-            title: 'Частые вопросы',
-            message: '· Как начать тренировки?\n· Как считать КБЖУ?\n· Сколько раз в неделю тренироваться?\n· Что есть до и после тренировки?\n· Как не сорваться с диеты?',
-            actions: [{ label: 'Понятно', variant: 'primary', onClick: () => {} }],
+            title: t('knowledge.faqTitle'),
+            message: t('knowledge.faqBody'),
+            actions: [{ label: t('knowledge.gotIt'), variant: 'primary', onClick: () => {} }],
           })
         }
         onSupport={() =>
           showModal({
-            title: 'Поддержка',
-            message: 'Напишите нам:\nsupport@train.app\n\nОтвечаем в течение 24 часов.',
+            title: t('knowledge.supportTitle'),
+            message: t('knowledge.supportBody'),
             actions: [
-              { label: 'Закрыть', variant: 'secondary', onClick: () => {} },
+              { label: t('common.close'), variant: 'secondary', onClick: () => {} },
               {
-                label: 'Написать письмо',
+                label: t('knowledge.writeEmail'),
                 variant: 'primary',
                 // Открываем почтовый клиент — своей отправки писем на бэкенде нет.
                 onClick: () => { window.location.href = 'mailto:support@train.app' },

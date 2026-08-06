@@ -30,7 +30,7 @@ function calcMacros(profile, weight) {
 const GOAL_IDS = ['cut', 'bulk', 'maintain', 'endurance', 'recomp']
 
 function YourGoalCard({ profile, currentWeight, onClick }) {
-  const { t } = useAppUI()
+  const { t, u } = useAppUI()
   const weight = Number(currentWeight ?? profile?.weight)
   const height = Number(profile?.height)
 
@@ -55,7 +55,7 @@ function YourGoalCard({ profile, currentWeight, onClick }) {
         <div className="your-goal__stats">
           <div className="your-goal__cell">
             <span>{t('home.weightNow')}</span>
-            <strong>{Number.isFinite(weight) ? `${weight.toFixed(1)} ${t('stats.kg')}` : '—'}</strong>
+            <strong>{Number.isFinite(weight) ? u.fmtWeight(weight) : '—'}</strong>
           </div>
           <div className="your-goal__cell">
             <span>{t('home.dailyMacros')}</span>
@@ -64,7 +64,7 @@ function YourGoalCard({ profile, currentWeight, onClick }) {
           </div>
           <div className="your-goal__cell">
             <span>{t('home.height')}</span>
-            <strong>{Number.isFinite(height) && height ? `${height} ${t('stats.cm')}` : '—'}</strong>
+            <strong>{u.fmtHeight(height)}</strong>
           </div>
         </div>
       </div>

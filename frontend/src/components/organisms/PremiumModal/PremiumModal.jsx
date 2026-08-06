@@ -4,51 +4,43 @@ import { getSubscriptionPlans, createPayment } from '../../../api/payments'
 import { useAppUI } from '../../../context/AppUIContext'
 import './PremiumModal.scss'
 
-const FEATURES = [
-  'Безлимитные программы тренировок',
-  'Персональный план питания с AI',
-  'Расширенная аналитика и графики',
-  'Видео-инструкции к каждому упражнению',
-  'Калькулятор TDEE / BMI / макросов',
-  'Приоритетная поддержка 24/7',
-  'Экспорт данных PDF / CSV',
-]
+// Только реальные возможности приложения — без пустых обещаний.
+const FEATURE_KEYS = ['premium.f1', 'premium.f2', 'premium.f3', 'premium.f4', 'premium.f5', 'premium.f6']
 
 function PremiumModal({ onClose }) {
   const [selected, setSelected] = useState('annual')
   const [loading, setLoading] = useState(false)
-  const [plans, setPlans] = useState([
-    { id: 'monthly', label: 'Месяц', price: '990₽', per: 'в месяц', tag: null },
-    { id: 'annual', label: 'Год', price: '4 990₽', per: 'в год', tag: 'Выгода 58%' },
-  ])
-  const { showToast } = useAppUI()
+  const [plans, setPlans] = useState([])
+  const { showToast, refreshUserProfile, t } = useAppUI()
 
   useEffect(() => {
     getSubscriptionPlans()
       .then(({ data }) => {
         setPlans(data.map((p) => ({
           id: p.id,
-          label: p.label,
+          label: p.id === 'monthly' ? t('premium.month') : t('premium.year'),
           price: `${p.price.toLocaleString('ru-RU')}₽`,
-          per: p.billing_period === 'month' ? 'в месяц' : 'в год',
-          tag: p.savings_percent ? `Выгода ${p.savings_percent}%` : null,
+          per: p.billing_period === 'month' ? t('premium.perMonth') : t('premium.perYear'),
+          tag: p.savings_percent ? t('premium.saving', { percent: p.savings_percent }) : null,
         })))
       })
       .catch(() => {})
-  }, [])
+  }, [t])
 
   const handleSubscribe = () => {
     setLoading(true)
-    createPayment(selected)
+    createPayment(selected, `${window.location.origin}/profile`)
       .then(({ data }) => {
         if (data.confirmation_url) {
           window.location.href = data.confirmation_url
         } else {
+          // Дев-режим: успех сразу — подтягиваем свежий статус подписки.
+          refreshUserProfile().catch(() => {})
           onClose()
         }
       })
       .catch(() => {
-        showToast('Ошибка оплаты. Попробуйте снова.')
+        showToast(t('premium.payError'))
         setLoading(false)
       })
   }
@@ -70,14 +62,14 @@ function PremiumModal({ onClose }) {
             <FaCrown />
           </div>
           <h1>PREMIUM</h1>
-          <p>Разблокируй весь потенциал своего тела</p>
+          <p>{t('premium.subtitle')}</p>
         </div>
 
         <ul className="premium-features">
-          {FEATURES.map((f) => (
-            <li key={f}>
+          {FEATURE_KEYS.map((key) => (
+            <li key={key}>
               <FaCheck className="premium-check" />
-              <span>{f}</span>
+              <span>{t(key)}</span>
             </li>
           ))}
         </ul>
@@ -113,14 +105,12 @@ function PremiumModal({ onClose }) {
           ) : (
             <>
               <FaBolt />
-              Подключить Premium
+              {t('premium.subscribe')}
             </>
           )}
         </button>
 
-        <p className="premium-legal">
-          Отмена подписки в любой момент · Безопасная оплата
-        </p>
+        <p className="premium-legal">{t('premium.note')}</p>
       </div>
     </div>
   )

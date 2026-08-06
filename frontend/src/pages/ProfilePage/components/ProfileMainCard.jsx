@@ -1,4 +1,7 @@
+import { useAppUI } from '../../../context/AppUIContext'
+
 function ProfileMainCard({ user }) {
+  const { u } = useAppUI()
   if (!user) return null
 
   const genderDisplay = user.gender_display || user.gender || '—'
@@ -10,8 +13,8 @@ function ProfileMainCard({ user }) {
       <p>{user.email || '—'}</p>
       <div className="profile-tags">
         <span>{genderDisplay}</span>
-        <span>{user.height ? `${user.height} см` : '—'}</span>
-        <span>{user.weight ? `${user.weight} кг` : '—'}</span>
+        <span>{user.height ? u.fmtHeight(user.height) : '—'}</span>
+        <span>{user.weight ? u.fmtWeight(user.weight) : '—'}</span>
         <span>{goalDisplay}</span>
       </div>
     </div>

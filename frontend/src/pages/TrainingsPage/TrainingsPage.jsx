@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAppUI } from '../../context/AppUIContext'
 import { getWorkoutCatalog } from '../../api/workouts'
 import SectionHead from '../../components/common/SectionHead'
 import FeaturedProgramCard from './components/FeaturedProgramCard'
@@ -8,6 +9,7 @@ import TrainingModeTabs from './components/TrainingModeTabs'
 import './TrainingsPage.scss'
 
 function TrainingsPage() {
+  const { t } = useAppUI()
   const [mode, setMode] = useState('gym')
   const [catalog, setCatalog] = useState({ gym: { featured: null, programs: [] }, home: { featured: null, programs: [] } })
   const navigate = useNavigate()
@@ -24,7 +26,7 @@ function TrainingsPage() {
 
   return (
     <section className="page page-trainings">
-      <SectionHead title="Тренировки" />
+      <SectionHead title={t('nav.trainings')} />
 
       <TrainingModeTabs mode={mode} onChange={setMode} />
 

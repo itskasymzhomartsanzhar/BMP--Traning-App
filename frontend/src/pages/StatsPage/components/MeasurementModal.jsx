@@ -12,13 +12,14 @@ const FIELDS = [
   { field: 'hip_cm', labelKey: 'stats.hips', placeholder: '96' },
 ]
 
-function initialValues(current) {
+// Бэкенд хранит сантиметры — в форме показываем выбранную систему.
+function initialValues(current, u) {
   const list = Array.isArray(current) ? current : []
   const values = {}
   FIELDS.forEach(({ field }) => {
     const found = list.find((m) => m.field === field)
     const num = found ? parseFloat(String(found.value).replace(',', '.')) : NaN
-    values[field] = Number.isFinite(num) ? String(num) : ''
+    values[field] = Number.isFinite(num) ? String(u.length(num)) : ''
   })
   return values
 }
@@ -28,8 +29,8 @@ function initialValues(current) {
  * значениями. Один POST со всеми полями за сегодняшнюю дату.
  */
 function MeasurementModal({ current = [], onClose, onSaved }) {
-  const { t } = useAppUI()
-  const [values, setValues] = useState(() => initialValues(current))
+  const { t, u } = useAppUI()
+  const [values, setValues] = useState(() => initialValues(current, u))
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -44,12 +45,13 @@ function MeasurementModal({ current = [], onClose, onSaved }) {
     for (const { field } of FIELDS) {
       const raw = String(values[field]).replace(',', '.').trim()
       if (raw === '') continue
-      const num = Number(raw)
-      if (!Number.isFinite(num) || num < 10 || num > 250) {
-        setError(t('stats.measureRangeError'))
+      // Ввод в выбранной системе, в API — всегда сантиметры.
+      const cm = u.lengthToCm(Number(raw))
+      if (!Number.isFinite(cm) || cm < 10 || cm > 250) {
+        setError(t('stats.measureRangeError', { unit: u.lengthLabel, min: u.length(10), max: u.length(250) }))
         return
       }
-      payload[field] = Math.round(num)
+      payload[field] = Math.round(cm)
       filled += 1
     }
     if (filled === 0) {
@@ -79,7 +81,7 @@ function MeasurementModal({ current = [], onClose, onSaved }) {
           </button>
         </div>
 
-        <p className="meas-hint">{t('stats.measureHint')}</p>
+        <p className="meas-hint">{t('stats.measureHint', { unit: u.lengthLabel })}</p>
 
         <div className="meas-fields">
           {FIELDS.map(({ field, labelKey, placeholder }) => (
@@ -91,11 +93,11 @@ function MeasurementModal({ current = [], onClose, onSaved }) {
                   inputMode="numeric"
                   step="1"
                   min="0"
-                  placeholder={placeholder}
+                  placeholder={String(u.length(placeholder))}
                   value={values[field]}
                   onChange={(e) => setField(field, e.target.value)}
                 />
-                <span className="meas-field__unit">{t('stats.cm')}</span>
+                <span className="meas-field__unit">{u.lengthLabel}</span>
               </span>
             </label>
           ))}

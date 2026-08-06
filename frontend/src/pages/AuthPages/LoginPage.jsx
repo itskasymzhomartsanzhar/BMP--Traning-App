@@ -7,7 +7,7 @@ import './AuthPages.scss'
 
 function LoginPage() {
   const navigate = useNavigate()
-  const { loginWithEmail, loginWithTelegramWidget, showToast, isAuthenticated } = useAppUI()
+  const { loginWithEmail, loginWithTelegramWidget, showToast, isAuthenticated, t } = useAppUI()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -19,14 +19,14 @@ function LoginPage() {
   const submit = (event) => {
     event.preventDefault()
     if (!email.trim() || !password) {
-      setError('Заполните почту и пароль.')
+      setError(t('auth.fillBoth'))
       return
     }
     setSaving(true)
     setError('')
     loginWithEmail(email.trim(), password)
       .catch((err) => {
-        setError(err.response?.data?.detail || 'Не удалось войти. Попробуйте ещё раз.')
+        setError(err.response?.data?.detail || t('auth.loginError'))
       })
       .finally(() => setSaving(false))
   }
@@ -38,17 +38,17 @@ function LoginPage() {
       <div className="auth-page__content">
         <form className="auth-form" onSubmit={submit} noValidate>
           <div className="auth-form__head">
-            <button type="button" className="auth-form__back" onClick={() => navigate('/welcome')} aria-label="Назад">
+            <button type="button" className="auth-form__back" onClick={() => navigate('/welcome')} aria-label={t('common.back')}>
               <FaArrowLeft />
             </button>
           </div>
 
-          <h1 className="auth-form__title">С возвращением</h1>
-          <p className="auth-form__subtitle">Войдите, чтобы продолжить тренировки.</p>
+          <h1 className="auth-form__title">{t('auth.welcomeBack')}</h1>
+          <p className="auth-form__subtitle">{t('auth.welcomeBackSub')}</p>
 
           <div className="auth-form__fields">
             <label className="auth-form__field">
-              Почта
+              {t('onb.email')}
               <input
                 type="email"
                 autoComplete="email"
@@ -60,7 +60,7 @@ function LoginPage() {
             </label>
 
             <label className="auth-form__field">
-              Пароль
+              {t('onb.password')}
               <input
                 type="password"
                 autoComplete="current-password"
@@ -76,28 +76,28 @@ function LoginPage() {
 
           <div className="auth-form__foot">
             <button type="submit" className="auth-actions__primary" disabled={saving}>
-              {saving ? 'Входим…' : 'Войти'}
+              {saving ? t('auth.signingIn') : t('auth.signIn')}
             </button>
 
             {telegramWidgetConfigured && (
               <>
-                <div className="auth-divider">или</div>
+                <div className="auth-divider">{t('auth.or')}</div>
                 <TelegramLoginButton
                   onAuth={(user) =>
                     loginWithTelegramWidget(user).catch((err) =>
-                      showToast(err.response?.data?.detail || 'Не удалось войти через Telegram'))
+                      showToast(err.response?.data?.detail || t('auth.tgError')))
                   }
                   onError={(err) => {
                     if (['Telegram login was cancelled', 'popup_closed'].includes(String(err?.message))) return
-                    showToast('Вход через Telegram не завершился. Попробуйте ещё раз.')
+                    showToast(t('auth.tgIncomplete'))
                   }}
                 />
               </>
             )}
 
             <p className="auth-form__switch">
-              Нет аккаунта?{' '}
-              <button type="button" onClick={() => navigate('/register')}>Создать</button>
+              {t('auth.noAccount')}{' '}
+              <button type="button" onClick={() => navigate('/register')}>{t('auth.create')}</button>
             </p>
           </div>
         </form>

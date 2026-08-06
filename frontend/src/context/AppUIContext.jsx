@@ -9,6 +9,7 @@ import { telegramLogin, telegramWidgetLogin, emailLogin, emailRegister, linkTele
 import { getMe, updateMe, updateTrainingSchedule } from '../api/users'
 import { ACCESS_KEY, REFRESH_KEY, cleanupLegacyTokens } from '../api/tokenStorage'
 import { translate } from '../i18n/translations'
+import { makeUnitHelpers } from '../i18n/units'
 
 const AppUIContext = createContext(null)
 
@@ -158,9 +159,19 @@ export function AppUIProvider({ children }) {
     }
   }, [])
 
+  // Перечитать профиль с сервера — например, после оплаты подписки.
+  const refreshUserProfile = useCallback(
+    () => getMe().then(({ data }) => { setUserProfile(data); return data }),
+    [],
+  )
+
   // Язык интерфейса из профиля; до входа — русский.
   const language = userProfile?.language === 'en' ? 'en' : 'ru'
   const t = useCallback((key, params) => translate(language, key, params), [language])
+
+  // Система измерения из профиля; конвертация только на экране, в API — метрика.
+  const unitSystem = userProfile?.units === 'imperial' ? 'imperial' : 'metric'
+  const u = useMemo(() => makeUnitHelpers(unitSystem, t), [unitSystem, t])
 
   // Анкета проставляет и профиль, и рекомендованное расписание разом.
   const completeOnboarding = useCallback((nextUser) => {
@@ -248,6 +259,7 @@ export function AppUIProvider({ children }) {
       showTrainingDays,
       userProfile,
       updateUserProfile,
+      refreshUserProfile,
       isOnboarded,
       completeOnboarding,
       loginWithEmail,
@@ -255,11 +267,12 @@ export function AppUIProvider({ children }) {
       loginWithTelegramWidget,
       language,
       t,
+      u,
       linkTelegramAccount,
       logout,
       devLogin,
     }),
-    [authReady, authStatus, isAuthenticated, showToast, showModal, showInfo, showConfirm, closeModal, showPremium, showCalculator, workoutCount, trainingDays, showTrainingDays, userProfile, updateUserProfile, isOnboarded, completeOnboarding, loginWithEmail, registerWithEmail, loginWithTelegramWidget, language, t, linkTelegramAccount, logout, devLogin],
+    [authReady, authStatus, isAuthenticated, showToast, showModal, showInfo, showConfirm, closeModal, showPremium, showCalculator, workoutCount, trainingDays, showTrainingDays, userProfile, updateUserProfile, refreshUserProfile, isOnboarded, completeOnboarding, loginWithEmail, registerWithEmail, loginWithTelegramWidget, language, t, u, linkTelegramAccount, logout, devLogin],
   )
 
   return (

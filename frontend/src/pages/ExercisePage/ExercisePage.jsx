@@ -34,7 +34,7 @@ function ExercisePage() {
   const { programId, index } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
-  const { showConfirm } = useAppUI()
+  const { showConfirm, t } = useAppUI()
 
   const [workout, setWorkout] = useState(location.state?.workout ?? null)
   const [exerciseTemplates, setExerciseTemplates] = useState([])
@@ -111,7 +111,7 @@ function ExercisePage() {
   }
 
   const handleSkip = () => {
-    showConfirm('Пропустить упражнение?', `${exercise.name} будет отмечено как пропущенное.`, () => goNext(true), 'Пропустить')
+    showConfirm(t('workout.skipTitle'), t('workout.skipMessage', { name: exercise.name }), () => goNext(true), t('workout.skip'))
   }
 
   return (
@@ -120,7 +120,7 @@ function ExercisePage() {
         title={`${currentIndex + 1} / ${total}`}
         subtitle={workout.title}
         onBack={() =>
-          showConfirm('Выйти из упражнения?', 'Вернуться к плану тренировки?', () =>
+          showConfirm(t('workout.exitExerciseTitle'), t('workout.exitExerciseMessage'), () =>
             navigate(`/trainings/${programId}/session`, { state: { workout, sessionId, elapsed } }),
           )
         }
@@ -154,36 +154,36 @@ function ExercisePage() {
         </div>
         <div className="exercise-info-btn__swap">
           <FaArrowsRotate />
-          <span>Заменить</span>
+          <span>{t('workout.swap')}</span>
         </div>
       </button>
 
       <div className="exercise-stats card animate-in delay-2">
         <div className="exercise-stats__item">
-          <span>Подходы</span>
+          <span>{t('workout.sets')}</span>
           <strong>{exercise.sets}</strong>
         </div>
         <div className="exercise-stats__item">
-          <span>Повторения</span>
+          <span>{t('workout.reps')}</span>
           <strong>{exercise.reps}</strong>
         </div>
         <div className="exercise-stats__item">
-          <span>Вес</span>
+          <span>{t('home.statWeight')}</span>
           <strong>{exercise.weight}</strong>
         </div>
         <div className="exercise-stats__item">
-          <span>Отдых</span>
+          <span>{t('workout.rest')}</span>
           <strong>{exercise.rest}</strong>
         </div>
       </div>
 
       <div className="exercise-actions animate-in delay-3">
         <button type="button" className="secondary" onClick={handleSkip}>
-          Пропустить
+          {t('workout.skip')}
         </button>
         <button type="button" className="primary exercise-done-btn" onClick={handleDone}>
           <FaCheck aria-hidden="true" />
-          Выполнено
+          {t('workout.done')}
         </button>
       </div>
 

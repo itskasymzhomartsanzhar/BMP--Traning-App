@@ -16,7 +16,7 @@ function WorkoutSessionPage() {
   const { programId } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
-  const { showConfirm } = useAppUI()
+  const { showConfirm, t } = useAppUI()
 
   const [workout, setWorkout] = useState(location.state?.workout ?? null)
   const [sessionId, setSessionId] = useState(null)
@@ -62,20 +62,20 @@ function WorkoutSessionPage() {
 
   const handleBack = () => {
     showConfirm(
-      'Выйти из тренировки?',
-      'Прогресс текущей сессии будет сброшен.',
+      t('workout.exitTitle'),
+      t('workout.exitMessage'),
       () => {
         if (sessionId) updateSession(sessionId, { status: 'abandoned' }).catch(() => {})
         navigate(`/trainings/${programId}`)
       },
-      'Выйти',
+      t('workout.exitAction'),
     )
   }
 
   if (!workout) {
     return (
       <section className="page page-workout-session">
-        <BackHeader title="Загрузка..." onBack={() => navigate('/trainings')} />
+        <BackHeader title={t('common.loading')} onBack={() => navigate('/trainings')} />
       </section>
     )
   }
@@ -83,25 +83,25 @@ function WorkoutSessionPage() {
   return (
     <section className="page page-workout-session">
       <BackHeader
-        title="Тренировка"
+        title={t('workout.title')}
         subtitle={workout.title}
         onBack={handleBack}
       />
 
       <div className="session-timer card animate-in delay-1">
-        <p className="session-timer__label">Время сессии</p>
+        <p className="session-timer__label">{t('workout.sessionTime')}</p>
         <p className="session-timer__value">{formatTime(elapsed)}</p>
         <button
           type="button"
           className={`session-timer__toggle ${running ? 'secondary' : 'primary'}`}
           onClick={() => setRunning((v) => !v)}
         >
-          {running ? <><FaPause /> Пауза</> : <><FaPlay /> Старт таймера</>}
+          {running ? <><FaPause /> {t('workout.pause')}</> : <><FaPlay /> {t('workout.startTimer')}</>}
         </button>
       </div>
 
       <div className="card animate-in delay-2">
-        <h2>План · {workout.exercises.length} упражнений</h2>
+        <h2>{t('workout.plan')} · {workout.exercises.length}</h2>
         <ul className="session-exercises">
           {workout.exercises.map((ex, i) => (
             <li
@@ -128,7 +128,7 @@ function WorkoutSessionPage() {
         onClick={() => navigate(`/trainings/${programId}/exercise/0`, { state: { workout, sessionId, elapsed } })}
       >
         <FaPlay aria-hidden="true" />
-        Начать с первого упражнения
+        {t('workout.startFirst')}
       </button>
     </section>
   )

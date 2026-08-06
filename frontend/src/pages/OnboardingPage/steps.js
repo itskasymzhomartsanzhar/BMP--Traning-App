@@ -1,45 +1,42 @@
+// Опции шагов: подписи — ключи переводов (labelKey/hintKey),
+// рендер переводит их через t() из контекста.
+
 export const GENDER_OPTIONS = [
-  { id: 'male', label: 'Мужской' },
-  { id: 'female', label: 'Женский' },
+  { id: 'male', labelKey: 'profile.male' },
+  { id: 'female', labelKey: 'profile.female' },
 ]
 
 export const GOAL_OPTIONS = [
-  { id: 'cut', label: 'Похудеть', hint: 'Снизить процент жира, стать суше' },
-  { id: 'bulk', label: 'Набрать массу', hint: 'Прибавить мышцы и силу' },
-  { id: 'maintain', label: 'Поддержать форму', hint: 'Оставаться в тонусе' },
-  { id: 'endurance', label: 'Выносливость', hint: 'Больше энергии и дыхалки' },
-  { id: 'recomp', label: 'Рекомпозиция', hint: 'Меньше жира, больше мышц' },
+  { id: 'cut', labelKey: 'onb.goalCut', hintKey: 'onb.goalCutHint' },
+  { id: 'recomp', labelKey: 'onb.goalRecomp', hintKey: 'onb.goalRecompHint' },
+  { id: 'bulk', labelKey: 'onb.goalBulk', hintKey: 'onb.goalBulkHint' },
 ]
 
 export const LEVEL_OPTIONS = [
-  { id: 'beginner', label: 'Новичок', hint: 'Мало опыта или большой перерыв' },
-  { id: 'intermediate', label: 'Средний', hint: 'Тренируюсь регулярно' },
-  { id: 'advanced', label: 'Продвинутый', hint: 'Стаж больше двух лет' },
-  { id: 'custom', label: 'Своя программа', hint: 'Сам выбираю упражнения и дни' },
+  { id: 'beginner', labelKey: 'onb.levelBeginner', hintKey: 'onb.levelBeginnerHint' },
+  { id: 'intermediate', labelKey: 'onb.levelIntermediate', hintKey: 'onb.levelIntermediateHint' },
+  { id: 'advanced', labelKey: 'onb.levelAdvanced', hintKey: 'onb.levelAdvancedHint' },
+  { id: 'custom', labelKey: 'onb.levelCustom', hintKey: 'onb.levelCustomHint' },
 ]
 
 export const PLACE_OPTIONS = [
-  { id: 'gym', label: 'В зале', hint: 'Есть доступ к оборудованию' },
-  { id: 'home', label: 'Дома', hint: 'Минимум инвентаря' },
+  { id: 'gym', labelKey: 'onb.placeGym' },
+  { id: 'home', labelKey: 'onb.placeHome' },
 ]
 
 export const INJURY_OPTIONS = [
-  { id: 'none', label: 'Нет травм' },
-  { id: 'knee', label: 'Колени' },
-  { id: 'back', label: 'Спина · поясница' },
-  { id: 'shoulder', label: 'Плечи' },
-  { id: 'wrist', label: 'Запястья' },
-  { id: 'ankle', label: 'Голеностоп' },
+  { id: 'none', labelKey: 'onb.injNone' },
+  { id: 'knee', labelKey: 'onb.injKnee' },
+  { id: 'back', labelKey: 'onb.injBack' },
+  { id: 'shoulder', labelKey: 'onb.injShoulder' },
+  { id: 'wrist', labelKey: 'onb.injWrist' },
+  { id: 'ankle', labelKey: 'onb.injAnkle' },
 ]
 
+// Подписи дней берутся из 'calendar.weekdays' по индексу.
 export const DAY_OPTIONS = [
-  { id: 'mon', label: 'Пн' },
-  { id: 'tue', label: 'Вт' },
-  { id: 'wed', label: 'Ср' },
-  { id: 'thu', label: 'Чт' },
-  { id: 'fri', label: 'Пт' },
-  { id: 'sat', label: 'Сб' },
-  { id: 'sun', label: 'Вс' },
+  { id: 'mon' }, { id: 'tue' }, { id: 'wed' }, { id: 'thu' },
+  { id: 'fri' }, { id: 'sat' }, { id: 'sun' },
 ]
 
 const DAY_ORDER = DAY_OPTIONS.map((d) => d.id)
@@ -76,49 +73,49 @@ export function calcAge(birthDate) {
   return age
 }
 
-export function validateStep(step, form) {
+export function validateStep(step, form, t) {
   const errors = {}
 
   if (step === 'name') {
-    if (!form.name.trim()) errors.name = 'Укажите имя'
-    else if (form.name.trim().length < 2) errors.name = 'Слишком короткое имя'
+    if (!form.name.trim()) errors.name = t('onb.errName')
+    else if (form.name.trim().length < 2) errors.name = t('onb.errNameShort')
   }
 
   if (step === 'birth') {
     const age = calcAge(form.birthDate)
-    if (!form.birthDate) errors.birthDate = 'Укажите дату рождения'
-    else if (age === null) errors.birthDate = 'Некорректная дата'
-    else if (age < 14) errors.birthDate = 'Приложение доступно с 14 лет'
-    else if (age > 100) errors.birthDate = 'Проверьте дату рождения'
+    if (!form.birthDate) errors.birthDate = t('onb.errBirth')
+    else if (age === null) errors.birthDate = t('onb.errBirthInvalid')
+    else if (age < 14) errors.birthDate = t('onb.errAge14')
+    else if (age > 100) errors.birthDate = t('onb.errAge100')
   }
 
   if (step === 'body') {
     const height = Number(String(form.height).replace(',', '.'))
     const weight = Number(String(form.weight).replace(',', '.'))
-    if (!form.height) errors.height = 'Укажите рост'
-    else if (!Number.isFinite(height) || height < 80 || height > 250) errors.height = 'Рост от 80 до 250 см'
-    if (!form.weight) errors.weight = 'Укажите вес'
-    else if (!Number.isFinite(weight) || weight < 20 || weight > 300) errors.weight = 'Вес от 20 до 300 кг'
-    if (!form.gender) errors.gender = 'Выберите пол'
+    if (!form.height) errors.height = t('onb.errHeight')
+    else if (!Number.isFinite(height) || height < 80 || height > 250) errors.height = t('onb.errHeightRange')
+    if (!form.weight) errors.weight = t('onb.errWeight')
+    else if (!Number.isFinite(weight) || weight < 20 || weight > 300) errors.weight = t('onb.errWeightRange')
+    if (!form.gender) errors.gender = t('onb.errGender')
   }
 
-  if (step === 'goal' && !form.goal) errors.goal = 'Выберите цель'
+  if (step === 'goal' && !form.goal) errors.goal = t('onb.errGoal')
   if (step === 'level') {
-    if (!form.level) errors.level = 'Выберите уровень'
+    if (!form.level) errors.level = t('onb.errLevel')
     // При «своей программе» место тренировок не спрашиваем.
-    if (!isCustomProgram(form) && !form.place) errors.place = 'Выберите, где будете тренироваться'
+    if (!isCustomProgram(form) && !form.place) errors.place = t('onb.errPlace')
   }
 
   if (step === 'days' && form.trainingDays.length === 0) {
-    errors.days = 'Выберите хотя бы один день'
+    errors.days = t('onb.errDays')
   }
 
   if (step === ACCOUNT_STEP) {
     const email = form.email.trim()
-    if (!email) errors.email = 'Укажите почту'
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = 'Некорректная почта'
-    if (!form.password) errors.password = 'Придумайте пароль'
-    else if (form.password.length < 8) errors.password = 'Минимум 8 символов'
+    if (!email) errors.email = t('onb.errEmail')
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = t('onb.errEmailInvalid')
+    if (!form.password) errors.password = t('onb.errPassword')
+    else if (form.password.length < 8) errors.password = t('onb.errPassword8')
   }
 
   return errors

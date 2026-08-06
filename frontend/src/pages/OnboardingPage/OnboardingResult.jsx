@@ -1,11 +1,12 @@
 import { FaBolt, FaClock, FaFire } from 'react-icons/fa6'
+import { useAppUI } from '../../context/AppUIContext'
 import './OnboardingPage.scss'
 
-const DAY_LABELS = {
-  mon: 'Пн', tue: 'Вт', wed: 'Ср', thu: 'Чт', fri: 'Пт', sat: 'Сб', sun: 'Вс',
-}
+const DAY_IDS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 
-function OnboardingResult({ recommendation, userName, onStart, onSkip, startLabel = 'Начать тренировку', skipLabel = 'Позже, на главную' }) {
+function OnboardingResult({ recommendation, userName, onStart, onSkip, startLabel = null, skipLabel = null }) {
+  const { t } = useAppUI()
+  const weekdays = t('calendar.weekdays').split(',')
   const program = recommendation?.program
   const days = recommendation?.training_days ?? []
 
@@ -14,9 +15,9 @@ function OnboardingResult({ recommendation, userName, onStart, onSkip, startLabe
       <div className="onb__bg" aria-hidden="true" />
 
       <div className="onb__body">
-        <div className="onb-result__badge">Ваш план готов</div>
+        <div className="onb-result__badge">{t('onb.planReady')}</div>
         <h1 className="onb__title">
-          {userName ? `${userName}, начнём!` : 'Начнём!'}
+          {userName ? t('onb.letsGo', { name: userName }) : t('onb.letsGoNoName')}
         </h1>
         {recommendation?.reason && (
           <p className="onb__subtitle">{recommendation.reason}</p>
@@ -48,26 +49,24 @@ function OnboardingResult({ recommendation, userName, onStart, onSkip, startLabe
           </div>
         ) : (
           <div className="onb-plan">
-            <p className="onb-plan__desc">
-              Профиль сохранён. Программы появятся в разделе «Тренировки».
-            </p>
+            <p className="onb-plan__desc">{t('onb.profileSaved')}</p>
           </div>
         )}
 
         {days.length > 0 && (
           <div className="onb-days">
-            <p className="onb__label">Рекомендуемое расписание</p>
+            <p className="onb__label">{t('onb.schedule')}</p>
             <div className="onb-days__row">
-              {Object.keys(DAY_LABELS).map((id) => (
+              {DAY_IDS.map((id, index) => (
                 <span
                   key={id}
                   className={`onb-days__day${days.includes(id) ? ' is-on' : ''}`}
                 >
-                  {DAY_LABELS[id]}
+                  {weekdays[index]}
                 </span>
               ))}
             </div>
-            <p className="onb__hint">Расписание можно поменять в любой момент на главной.</p>
+            <p className="onb__hint">{t('onb.scheduleHint')}</p>
           </div>
         )}
       </div>
@@ -75,12 +74,12 @@ function OnboardingResult({ recommendation, userName, onStart, onSkip, startLabe
       <footer className="onb__foot">
         {program && (
           <button type="button" className="onb__next" onClick={onStart}>
-            {startLabel}
+            {startLabel || t('home.startWorkout')}
           </button>
         )}
         {onSkip && (
           <button type="button" className="onb__skip" onClick={onSkip}>
-            {skipLabel}
+            {skipLabel || t('onb.later')}
           </button>
         )}
       </footer>

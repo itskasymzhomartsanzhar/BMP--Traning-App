@@ -91,27 +91,21 @@
   line-height: 1;
 }
 
-.premium-button {
-  min-width: 124px;
+.calendar-button {
+  width: 44px;
   height: 44px;
   border-radius: 999px;
-  border: 1px solid #d7c8ad;
-  background: linear-gradient(180deg, #f2eac7, #d6c6bb);
-  color: #151515;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, #232323, #1a1a1a);
+  color: var(--accent);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 0 14px;
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 14px;
 }
 
-.premium-button svg {
-  width: 22px;
-  height: 22px;
+.calendar-button svg {
+  width: 19px;
+  height: 19px;
 }
 
 .icon-button {

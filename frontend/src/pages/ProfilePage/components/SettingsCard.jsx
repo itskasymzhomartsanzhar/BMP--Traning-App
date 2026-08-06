@@ -8,21 +8,31 @@ function SettingsCard() {
   const { showInfo, showToast, showConfirm, userProfile, updateUserProfile, linkTelegramAccount, logout, t } = useAppUI()
   const [tgModalOpen, setTgModalOpen] = useState(false)
 
-  const pushOn = userProfile?.push_notifications ?? true
   const hasTelegram = Boolean(userProfile?.tg_id)
   const insideTMA = isTelegramMiniApp()
+  // Пуши идут через Telegram-бота: без подключённого Telegram слать
+  // некуда, поэтому тумблер показывает НЕТ независимо от флага в БД.
+  const pushStored = userProfile?.push_notifications ?? true
+  const pushOn = hasTelegram && pushStored
 
   // updateUserProfile сам отправляет PATCH — второй запрос был бы дублем.
   const toggle = (field, currentVal) => {
     updateUserProfile({ [field]: !currentVal })
   }
 
+  // Без Telegram клик по тумблеру сразу запускает подключение —
+  // как если бы нажали «Подключить Telegram».
+  const handlePushToggle = () => {
+    if (!hasTelegram) {
+      handleLinkTelegram()
+      return
+    }
+    toggle('push_notifications', pushStored)
+  }
+
   const handleLinkTelegram = () => {
     if (!telegramWidgetConfigured) {
-      showInfo(
-        'Подключение Telegram',
-        'Вход через Telegram не настроен.\n\nЗадайте VITE_TG_LOGIN_CLIENT_ID в .env фронтенда (Client ID из BotFather: My Bots → Bot Settings → Web Login) и добавьте домен сайта в Allowed URLs там же.',
-      )
+      showInfo(t('profile.tgLinkTitle'), t('profile.tgNotConfigured'))
       return
     }
     setTgModalOpen(true)
@@ -35,7 +45,7 @@ function SettingsCard() {
       })
       .catch((err) => {
         setTgModalOpen(false)
-        showToast(err.response?.data?.detail || 'Не удалось подключить Telegram')
+        showToast(err.response?.data?.detail || t('profile.tgLinkError'))
       })
   }
 
@@ -43,12 +53,13 @@ function SettingsCard() {
     <div className="card settings-card animate-in delay-3">
       <h2>{t('profile.settings')}</h2>
 
-      <button type="button" className="toggle-row" onClick={() => toggle('push_notifications', pushOn)}>
+      <button type="button" className="toggle-row" onClick={handlePushToggle}>
         <span>{t('profile.push')}</span>
         <span className={pushOn ? 'toggle is-on' : 'toggle'}>{pushOn ? t('profile.yes') : t('profile.no')}</span>
       </button>
 
-      {!hasTelegram && (
+      {/* Внутри мини-аппа Telegram уже подключён по определению — кнопка не нужна. */}
+      {!hasTelegram && !insideTMA && (
         <button type="button" className="toggle-row settings-tg-link" onClick={handleLinkTelegram}>
           <span><FaTelegram aria-hidden="true" /> {t('profile.linkTelegram')}</span>
           <span className="arrow">›</span>
@@ -68,16 +79,16 @@ function SettingsCard() {
 
       {tgModalOpen && (
         <Modal
-          title="Подключить Telegram"
-          message="Нажмите кнопку ниже и подтвердите вход в Telegram — аккаунты свяжутся."
+          title={t('profile.linkTelegram')}
+          message={t('profile.tgLinkMessage')}
           onClose={() => setTgModalOpen(false)}
-          actions={[{ label: 'Отмена', variant: 'secondary', onClick: () => {} }]}
+          actions={[{ label: t('common.cancel'), variant: 'secondary', onClick: () => {} }]}
         >
           <TelegramLoginButton
             onAuth={onTelegramAuth}
             onError={(err) => {
               if (['Telegram login was cancelled', 'popup_closed'].includes(String(err?.message))) return
-              showToast('Подключение Telegram не завершилось. Попробуйте ещё раз.')
+              showToast(t('profile.tgLinkIncomplete'))
             }}
           />
         </Modal>

@@ -16,7 +16,7 @@ import './StatsPage.scss'
 
 function StatsPage() {
   const [activeTab, setActiveTab] = useState('dynamics')
-  const { showInfo, showToast, showModal, userProfile, updateUserProfile, t } = useAppUI()
+  const { showInfo, showToast, showModal, userProfile, updateUserProfile, t, u } = useAppUI()
 
   const [activity, setActivity] = useState([])
   const [weightHistory, setWeightHistory] = useState([])
@@ -36,21 +36,23 @@ function StatsPage() {
   const handleAddWeight = () => {
     showModal({
       title: t('stats.addWeightTitle'),
-      message: t('stats.addWeightMessage'),
-      input: { type: 'number', step: '0.1', placeholder: t('stats.addWeightPlaceholder') },
+      message: t('stats.addWeightMessage', { unit: u.weightLabel }),
+      input: { type: 'number', step: '0.1', placeholder: t('stats.addWeightPlaceholder', { example: u.imperial ? 160 : 72.5 }) },
       actions: [
         { label: t('common.cancel'), variant: 'secondary', onClick: () => {} },
         {
           label: t('common.save'),
           variant: 'primary',
           onClick: (inputValue) => {
-            const val = parseFloat(inputValue || '0')
-            if (!(val > 0)) {
+            const entered = parseFloat(String(inputValue || '0').replace(',', '.'))
+            if (!(entered > 0)) {
               showToast(t('stats.weightError'))
               return
             }
+            // В API вес всегда в килограммах.
+            const kg = Number(u.weightToKg(entered).toFixed(1))
             const today = new Date().toISOString().slice(0, 10)
-            addWeight(val, today)
+            addWeight(kg, today)
               .then(() => getWeightHistory().then(({ data }) => setWeightHistory(data)))
               .catch(() => showToast(t('stats.weightSaveError')))
           },
@@ -62,17 +64,18 @@ function StatsPage() {
   const handleEditHeight = () => {
     showModal({
       title: t('stats.editHeightTitle'),
-      message: userProfile?.height ? t('stats.heightCurrent', { height: userProfile.height }) : t('stats.heightEmpty'),
-      input: { type: 'number', step: '1', defaultValue: userProfile?.height ?? '', placeholder: t('stats.heightPlaceholder') },
+      message: userProfile?.height ? t('stats.heightCurrent', { height: u.fmtHeight(userProfile.height) }) : t('stats.heightEmpty'),
+      input: { type: 'number', step: '1', defaultValue: userProfile?.height ? u.length(userProfile.height) : '', placeholder: t('stats.heightPlaceholder', { unit: u.lengthLabel }) },
       actions: [
         { label: t('common.cancel'), variant: 'secondary', onClick: () => {} },
         {
           label: t('common.save'),
           variant: 'primary',
           onClick: (inputValue) => {
-            const height = Math.round(Number(String(inputValue).replace(',', '.')))
+            const entered = Number(String(inputValue).replace(',', '.'))
+            const height = Math.round(u.lengthToCm(entered))
             if (!Number.isFinite(height) || height < 80 || height > 250) {
-              showToast(t('stats.heightError'))
+              showToast(t('stats.heightError', { min: u.length(80), max: u.length(250), unit: u.lengthLabel }))
               return
             }
             updateUserProfile({ height })
@@ -100,7 +103,7 @@ function StatsPage() {
         <>
           <MeasurementsCard measurements={measurements} onEdit={() => setMeasureOpen(true)} />
           <button type="button" className="secondary animate-in delay-3" onClick={handleEditHeight}>
-            {t('stats.editHeight')}{userProfile?.height ? ` · ${t('stats.heightNow', { height: userProfile.height })}` : ''}
+            {t('stats.editHeight')}{userProfile?.height ? ` · ${t('stats.heightNow', { height: u.fmtHeight(userProfile.height) })}` : ''}
           </button>
         </>
       )}
@@ -126,7 +129,13 @@ function StatsPage() {
       <ActivityCard
         items={activity}
         onDayClick={(item) =>
-          showInfo(`${item.day}: активность`, `${item.value} тренировок за день.`)
+          showInfo(
+            `${item.day} · ${t('stats.activityByDay')}`,
+            [
+              t('stats.activityWorkouts', { n: item.workouts ?? item.value ?? 0 }),
+              t('stats.activityNutrition', { status: item.nutrition_done ? '✓' : '—' }),
+            ].join('\n'),
+          )
         }
       />
     </section>

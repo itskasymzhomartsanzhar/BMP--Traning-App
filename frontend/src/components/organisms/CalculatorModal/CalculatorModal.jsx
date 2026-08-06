@@ -7,13 +7,15 @@ import './CalculatorModal.scss'
 // Цели профиля шире, чем режимы калькулятора — сводим к трём.
 const GOAL_TO_CALC = { cut: 'cut', bulk: 'bulk', maintain: 'maintain', endurance: 'maintain', recomp: 'maintain' }
 
+// Единственный режим — расчёт КБЖУ (macros).
 function CalculatorModal({ onClose }) {
-  const { userProfile } = useAppUI()
-  const [type, setType] = useState('tdee')
+  const { userProfile, u, t } = useAppUI()
+  const type = 'macros'
   // По умолчанию — данные из опроса/профиля; вес уточняется свежим замером ниже.
+  // В форме — выбранная система измерения, расчёт всегда в метрике.
   const [form, setForm] = useState(() => ({
-    weight: userProfile?.weight != null ? String(userProfile.weight) : '',
-    height: userProfile?.height != null ? String(userProfile.height) : '',
+    weight: userProfile?.weight != null ? String(u.weight(userProfile.weight)) : '',
+    height: userProfile?.height != null ? String(u.length(userProfile.height)) : '',
     age: userProfile?.age != null ? String(userProfile.age) : '',
     activity: '1.55',
     goal: GOAL_TO_CALC[userProfile?.goal] || 'maintain',
@@ -27,21 +29,21 @@ function CalculatorModal({ onClose }) {
       .then(({ data }) => {
         const last = Array.isArray(data) && data.length > 0 ? data[data.length - 1] : null
         if (last?.value) {
-          setForm((prev) => ({ ...prev, weight: String(last.value) }))
+          setForm((prev) => ({ ...prev, weight: String(u.weight(last.value)) }))
         }
       })
       .catch(() => {})
-  }, [])
+  }, [u])
 
   const setField = (field, value) => setForm((prev) => ({ ...prev, [field]: value }))
 
   const calculate = () => {
-    const weight = Number(form.weight)
-    const height = Number(form.height)
+    const weight = u.weightToKg(Number(form.weight))
+    const height = u.lengthToCm(Number(form.height))
     const age = Number(form.age)
     const activity = Number(form.activity)
     if (!weight || !height || !age || !activity) {
-      setResult({ error: 'Заполните все поля' })
+      setResult({ error: t('calc.fillAll') })
       return
     }
 
@@ -52,31 +54,18 @@ function CalculatorModal({ onClose }) {
 
     const tdee = Math.round(bmr * activity)
 
-    if (type === 'bmi') {
-      const bmi = (weight / ((height / 100) ** 2)).toFixed(1)
-      const bmiLabel =
-        bmi < 18.5 ? 'Дефицит' : bmi < 25 ? 'Норма' : bmi < 30 ? 'Избыточный' : 'Ожирение'
-      setResult({ label: 'BMI', value: bmi, sub: bmiLabel })
-      return
-    }
-
-    if (type === 'tdee') {
-      setResult({ label: 'TDEE', value: `${tdee} ккал`, sub: 'поддержание веса' })
-      return
-    }
-
     const targetKcal =
       form.goal === 'cut' ? tdee - 300 : form.goal === 'bulk' ? tdee + 300 : tdee
     const protein = Math.round(weight * 2)
     const fat = Math.round(weight * 0.8)
     const carbs = Math.round((targetKcal - protein * 4 - fat * 9) / 4)
     setResult({
-      label: 'Макросы',
-      value: `${targetKcal} ккал`,
+      label: t('calc.macros'),
+      value: `${targetKcal} ${t('home.kcal')}`,
       macros: [
-        { label: 'Белки', value: `${protein} г` },
-        { label: 'Жиры', value: `${fat} г` },
-        { label: 'Углеводы', value: `${carbs} г` },
+        { label: t('nutrition.protein'), value: `${protein} ${t('nutrition.grams')}` },
+        { label: t('nutrition.fats'), value: `${fat} ${t('nutrition.grams')}` },
+        { label: t('nutrition.carbs'), value: `${carbs} ${t('nutrition.grams')}` },
       ],
     })
   }
@@ -92,29 +81,16 @@ function CalculatorModal({ onClose }) {
         <div className="calc-sheet__head">
           <div className="calc-sheet__title">
             <FaCalculator />
-            <h2>Калькулятор</h2>
+            <h2>{t('nutrition.calculator')}</h2>
           </div>
-          <button type="button" className="calc-close" onClick={onClose} aria-label="Закрыть">
+          <button type="button" className="calc-close" onClick={onClose} aria-label={t('common.close')}>
             <FaXmark />
           </button>
         </div>
 
-        <div className="tab-row compact">
-          {['tdee', 'bmi', 'macros'].map((t) => (
-            <button
-              key={t}
-              type="button"
-              className={type === t ? 'tab is-active' : 'tab'}
-              onClick={() => { setType(t); setResult(null) }}
-            >
-              {t.toUpperCase()}
-            </button>
-          ))}
-        </div>
-
         <div className="calc-grid">
           <label>
-            Вес (кг)
+            {t('home.statWeight')} ({u.weightLabel})
             <input
               type="number"
               value={form.weight}
@@ -122,7 +98,7 @@ function CalculatorModal({ onClose }) {
             />
           </label>
           <label>
-            Рост (см)
+            {t('home.height')} ({u.lengthLabel})
             <input
               type="number"
               value={form.height}
@@ -130,7 +106,7 @@ function CalculatorModal({ onClose }) {
             />
           </label>
           <label>
-            Возраст
+            {t('calc.age')}
             <input
               type="number"
               value={form.age}
@@ -138,36 +114,36 @@ function CalculatorModal({ onClose }) {
             />
           </label>
           <label>
-            Активность
+            {t('calc.activity')}
             <select value={form.activity} onChange={(e) => setField('activity', e.target.value)}>
-              <option value="1.2">Низкая</option>
-              <option value="1.375">Лёгкая</option>
-              <option value="1.55">Средняя</option>
-              <option value="1.725">Высокая</option>
-              <option value="1.9">Очень высокая</option>
+              <option value="1.2">{t('calc.actLow')}</option>
+              <option value="1.375">{t('calc.actLight')}</option>
+              <option value="1.55">{t('calc.actMedium')}</option>
+              <option value="1.725">{t('calc.actHigh')}</option>
+              <option value="1.9">{t('calc.actVeryHigh')}</option>
             </select>
           </label>
           <label>
-            Пол
+            {t('profile.gender')}
             <select value={form.gender} onChange={(e) => setField('gender', e.target.value)}>
-              <option value="male">Мужской</option>
-              <option value="female">Женский</option>
+              <option value="male">{t('profile.male')}</option>
+              <option value="female">{t('profile.female')}</option>
             </select>
           </label>
           {type === 'macros' && (
             <label>
-              Цель
+              {t('profile.goal')}
               <select value={form.goal} onChange={(e) => setField('goal', e.target.value)}>
-                <option value="cut">Сушка −300 ккал</option>
-                <option value="maintain">Поддержание</option>
-                <option value="bulk">Набор +300 ккал</option>
+                <option value="cut">{t('calc.goalCut')}</option>
+                <option value="maintain">{t('goals.maintain')}</option>
+                <option value="bulk">{t('calc.goalBulk')}</option>
               </select>
             </label>
           )}
         </div>
 
         <button type="button" className="primary" onClick={calculate}>
-          Рассчитать
+          {t('calc.calculate')}
         </button>
 
         {result && (

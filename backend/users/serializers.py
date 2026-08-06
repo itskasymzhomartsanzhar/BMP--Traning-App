@@ -10,6 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
     goal_display = serializers.SerializerMethodField()
     age = serializers.ReadOnlyField()
     is_onboarded = serializers.ReadOnlyField()
+    is_premium = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -17,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
             'id', 'tg_id', 'username', 'first_name', 'display_name', 'name',
             'email', 'avatar_url', 'gender', 'gender_display', 'weight', 'height',
             'goal', 'goal_display', 'birth_date', 'age', 'level', 'place', 'injuries',
-            'is_onboarded', 'onboarded_at', 'recommended_program',
+            'is_onboarded', 'onboarded_at', 'recommended_program', 'is_premium',
             'push_notifications', 'email_newsletter', 'language', 'units',
             'workout_count', 'training_days', 'created_at',
         ]
@@ -34,6 +35,11 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_goal_display(self, obj):
         return dict(User.GOAL_CHOICES).get(obj.goal, '')
+
+    def get_is_premium(self, obj):
+        # OneToOne может отсутствовать: подписка создаётся при первом обращении.
+        sub = getattr(obj, 'subscription', None)
+        return bool(sub and sub.is_premium)
 
 
 class OnboardingSerializer(serializers.Serializer):

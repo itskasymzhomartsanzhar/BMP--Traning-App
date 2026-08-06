@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { FaClock, FaFireFlameSimple, FaDumbbell } from 'react-icons/fa6'
 import BackHeader from '../../components/organisms/BackHeader/BackHeader'
+import { useAppUI } from '../../context/AppUIContext'
 import { getWorkout } from '../../api/workouts'
 import './WorkoutPlanPage.scss'
 
 function WorkoutPlanPage() {
+  const { t } = useAppUI()
   const { programId } = useParams()
   const navigate = useNavigate()
   const [workout, setWorkout] = useState(null)
@@ -19,7 +21,7 @@ function WorkoutPlanPage() {
   if (!workout) {
     return (
       <section className="page page-workout-plan">
-        <BackHeader title="Загрузка..." onBack={() => navigate('/trainings')} />
+        <BackHeader title={t('common.loading')} onBack={() => navigate('/trainings')} />
       </section>
     )
   }
@@ -48,7 +50,7 @@ function WorkoutPlanPage() {
       </div>
 
       <div className="card animate-in delay-2">
-        <h2>Упражнения · {workout.exercises.length}</h2>
+        <h2>{t('workout.exercises')} · {workout.exercises.length}</h2>
         <ul className="exercise-list">
           {workout.exercises.map((ex, i) => (
             <li key={ex.id + i} className="exercise-list__item">
@@ -70,7 +72,7 @@ function WorkoutPlanPage() {
         className="primary animate-in delay-3"
         onClick={() => navigate(`/trainings/${programId}/session`, { state: { workout } })}
       >
-        Начать тренировку
+        {t('home.startWorkout')}
       </button>
     </section>
   )
