@@ -458,7 +458,8 @@ class TelegramWidgetAuthView(APIView):
             user_data = _telegram_widget_user_data(request.data)
         except AuthError as err:
             logger.warning('Telegram widget auth failed: %s', err.detail)
-            return Response({'detail': 'Не удалось подтвердить данные Telegram.'}, status=err.status)
+            # Причину показываем в ответе — иначе на проде её не увидеть без логов.
+            return Response({'detail': f'Не удалось подтвердить данные Telegram ({err.detail}).'}, status=err.status)
         except (KeyError, ValueError) as err:
             logger.warning('Telegram widget auth failed: %s', err)
             return Response({'detail': 'Не удалось подтвердить данные Telegram.'}, status=status.HTTP_403_FORBIDDEN)
@@ -489,7 +490,8 @@ class LinkTelegramView(APIView):
         try:
             user_data = _telegram_widget_user_data(request.data)
         except AuthError as err:
-            return Response({'detail': 'Не удалось подтвердить данные Telegram.'}, status=err.status)
+            logger.warning('Telegram link auth failed: %s', err.detail)
+            return Response({'detail': f'Не удалось подтвердить данные Telegram ({err.detail}).'}, status=err.status)
         except (KeyError, ValueError):
             return Response({'detail': 'Не удалось подтвердить данные Telegram.'}, status=status.HTTP_403_FORBIDDEN)
 

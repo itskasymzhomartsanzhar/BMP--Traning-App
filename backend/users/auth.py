@@ -137,7 +137,10 @@ class TelegramLoginOidcAuth:
         if telegram_id is None:
             raise AuthError(detail='telegram user id is missing')
 
-        first_name = str(telegram_user.get('first_name') or payload.get('given_name') or '').strip()
+        # Telegram кладёт имя в стандартный OIDC-claim "name".
+        first_name = str(
+            telegram_user.get('first_name') or payload.get('name') or payload.get('given_name') or ''
+        ).strip()
         last_name = str(telegram_user.get('last_name') or payload.get('family_name') or '').strip()
         display_name = ' '.join(part for part in [first_name, last_name] if part).strip()
         username = str(telegram_user.get('username') or payload.get('preferred_username') or '').strip()
@@ -158,20 +161,28 @@ class TelegramLoginOidcAuth:
             raise AuthError(status=503, detail='telegram login client id is not configured')
 
         signing_key = self._get_signing_key(token)
-        last_error = None
-        for client_id in self._client_ids:
-            try:
-                return jwt.decode(
-                    token,
-                    signing_key,
-                    algorithms=self.ALLOWED_ALGORITHMS,
-                    audience=client_id,
-                    issuer=self.ISSUER,
-                    options={'require': ['exp', 'iat', 'iss', 'aud', 'sub']},
-                )
-            except InvalidTokenError as exc:
-                last_error = exc
-        raise AuthError(detail=str(last_error) or 'invalid id_token')
+        try:
+            payload = jwt.decode(
+                token,
+                signing_key,
+                algorithms=self.ALLOWED_ALGORITHMS,
+                issuer=self.ISSUER,
+                # Аудиторию сверяем сами: PyJWT ждёт строку, а Telegram может
+                # отдать aud числом (id бота) — это валило вход с ошибкой
+                # «Invalid claim format in token».
+                options={'require': ['exp', 'iss', 'sub'], 'verify_aud': False},
+            )
+        except InvalidTokenError as exc:
+            raise AuthError(detail=f'invalid id_token: {exc}')
+
+        aud = payload.get('aud')
+        aud_values = aud if isinstance(aud, list) else [aud]
+        aud_normalized = {str(value).strip() for value in aud_values if value is not None}
+        if not aud_normalized & set(self._client_ids):
+            raise AuthError(
+                detail=f'audience mismatch: token={sorted(aud_normalized)}, configured={self._client_ids}',
+            )
+        return payload
 
     def _get_signing_key(self, id_token: str):
         try:
