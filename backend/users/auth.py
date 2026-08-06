@@ -1,14 +1,16 @@
 import hashlib
 import hmac
 import json
+import socket
 import time
 from dataclasses import dataclass
 from operator import itemgetter
 from typing import Any
-from urllib.parse import unquote, parse_qsl
+from urllib.parse import unquote, parse_qsl, urlparse
 
 import jwt
 import requests
+import urllib3
 from django.core.cache import cache
 from jwt import InvalidTokenError, PyJWK
 
