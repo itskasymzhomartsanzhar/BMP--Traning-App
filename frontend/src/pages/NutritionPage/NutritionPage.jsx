@@ -1,10 +1,16 @@
-import { useEffect, useState } from 'react'
-import { FaArrowDown, FaArrowUp, FaBullseye, FaGlassWater, FaMinus, FaPen, FaPercent, FaPlus, FaWeightScale } from 'react-icons/fa6'
+import { useEffect, useRef, useState } from 'react'
+import { FaArrowDown, FaArrowUp, FaBullseye, FaGlassWater, FaMinus, FaPen, FaPercent, FaPlus, FaWeightScale, FaXmark } from 'react-icons/fa6'
 import { useAppUI } from '../../context/AppUIContext'
-import { getNutritionDay, updateNutritionDay, addWater } from '../../api/nutrition'
+import { getNutritionDay, updateNutritionDay, addWater, deleteFoodEntry } from '../../api/nutrition'
 import { getMeasurements, addMeasurement, addWeight } from '../../api/analytics'
 import SectionHead from '../../components/common/SectionHead'
+import FoodFab from './components/FoodFab'
+import PhotoFoodModal from './components/PhotoFoodModal'
+import VoiceFoodModal from './components/VoiceFoodModal'
+import BarcodeFoodModal from './components/BarcodeFoodModal'
+import SearchFoodModal from './components/SearchFoodModal'
 import './NutritionPage.scss'
+import './components/FoodAdd.scss'
 
 const today = () => new Date().toISOString().slice(0, 10)
 
@@ -29,6 +35,9 @@ function NutritionPage() {
   const { showToast, showModal, showCalculator, userProfile, updateUserProfile, t, u } = useAppUI()
   const [day, setDay] = useState(null)
   const [bodyFat, setBodyFat] = useState(null)
+  const [foodModal, setFoodModal] = useState(null) // photo | voice | barcode | search
+  const [photoFile, setPhotoFile] = useState(null)
+  const photoInputRef = useRef(null)
 
   useEffect(() => {
     getNutritionDay().then(({ data }) => setDay(data)).catch(() => {})
@@ -171,11 +180,34 @@ function NutritionPage() {
     })
   }
 
+  const handlePhotoPicked = (e) => {
+    const file = e.target.files?.[0]
+    // Сбрасываем value, чтобы «Переснять» с тем же файлом снова сработал.
+    e.target.value = ''
+    if (!file) return
+    setPhotoFile(file)
+    setFoodModal('photo')
+  }
+
+  const handleDeleteEntry = (entryId) => {
+    deleteFoodEntry(entryId)
+      .then(({ data }) => setDay(data))
+      .catch(() => showToast(t('food.deleteError')))
+  }
+
+  const eaten = day?.eaten
+  const entries = day?.entries
+
   const macros = day ? [
-    { field: 'target_protein', label: t('nutrition.protein'), value: day?.target_protein },
-    { field: 'target_fats', label: t('nutrition.fats'), value: day?.target_fats },
-    { field: 'target_carbs', label: t('nutrition.carbs'), value: day?.target_carbs },
+    { field: 'target_protein', label: t('nutrition.protein'), value: day?.target_protein, eaten: eaten?.protein },
+    { field: 'target_fats', label: t('nutrition.fats'), value: day?.target_fats, eaten: eaten?.fats },
+    { field: 'target_carbs', label: t('nutrition.carbs'), value: day?.target_carbs, eaten: eaten?.carbs },
   ] : []
+
+  const caloriesPercent = day?.target_calories
+    ? Math.min(100, Math.round(((eaten?.calories ?? 0) / day.target_calories) * 100))
+    : 0
+  const caloriesOver = Boolean(day?.target_calories && (eaten?.calories ?? 0) > day.target_calories)
 
   const bmr = calcBmr(userProfile)
   const tdee = bmr ? Math.round(bmr * 1.55) : null
@@ -194,7 +226,13 @@ function NutritionPage() {
           <div className="nutrition-hero animate-in delay-1">
             <button type="button" className="nutrition-hero__calories" onClick={handleEditCalories}>
               <span className="nutrition-hero__label">{t('nutrition.calories')}</span>
-              <strong className="nutrition-hero__value">{day?.target_calories}</strong>
+              <strong className="nutrition-hero__value">
+                {Math.round(eaten?.calories ?? 0)}
+                <em> / {day?.target_calories}</em>
+              </strong>
+              <span className={`nutrition-hero__progress${caloriesOver ? ' nutrition-hero__progress--over' : ''}`}>
+                <i style={{ width: `${caloriesPercent}%` }} />
+              </span>
               {delta !== null && (
                 <span className="nutrition-hero__badge">
                   {Math.abs(delta) < 25
@@ -212,13 +250,51 @@ function NutritionPage() {
             <div className="nutrition-hero__macros">
               {macros.map((macro) => (
                 <button key={macro.field} type="button" className="macro-pill" onClick={() => handleEditMacro(macro)}>
-                  <span className="macro-pill__label">{macro.label}</span>
-                  <FaPen className="macro-pill__pen" aria-hidden="true" />
-                  <strong>{macro.value} {t('nutrition.grams')}</strong>
+                  <span className="macro-pill__top">
+                    <span className="macro-pill__label">{macro.label}</span>
+                    <FaPen className="macro-pill__pen" aria-hidden="true" />
+                    <strong>{Math.round(macro.eaten ?? 0)} / {macro.value} {t('nutrition.grams')}</strong>
+                  </span>
+                  <span className="macro-pill__bar">
+                    <i style={{ width: `${macro.value ? Math.min(100, Math.round(((macro.eaten ?? 0) / macro.value) * 100)) : 0}%` }} />
+                  </span>
                 </button>
               ))}
             </div>
           </div>
+
+          <h3 className="nutrition-subtitle animate-in delay-2">
+            {t('food.diary')}
+            {entries?.length > 0 && <em>{entries.length}</em>}
+          </h3>
+          {entries?.length > 0 ? (
+            <div className="food-diary animate-in delay-2">
+              {entries.map((entry) => (
+                <div key={entry.id} className="card food-diary__row">
+                  <div className="food-diary__info">
+                    <strong>{entry.name}</strong>
+                    <span>
+                      {entry.grams ? `${Math.round(entry.grams)} ${t('nutrition.grams')} · ` : ''}
+                      {t('nutrition.proteinShort')} {Math.round(entry.protein)}
+                      {' '}{t('nutrition.fatsShort')} {Math.round(entry.fats)}
+                      {' '}{t('nutrition.carbsShort')} {Math.round(entry.carbs)}
+                    </span>
+                  </div>
+                  <span className="food-diary__kcal">{Math.round(entry.calories)} {t('home.kcal')}</span>
+                  <button
+                    type="button"
+                    className="food-diary__remove"
+                    onClick={() => handleDeleteEntry(entry.id)}
+                    aria-label={t('common.delete')}
+                  >
+                    <FaXmark />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="card food-diary__empty animate-in delay-2">{t('food.diaryEmpty')}</div>
+          )}
 
           <h3 className="nutrition-subtitle animate-in delay-2">{t('home.goal')}</h3>
           <button type="button" className="card nutrition-tile animate-in delay-2" onClick={handleEditGoal}>
@@ -284,6 +360,41 @@ function NutritionPage() {
       <button type="button" className="secondary animate-in delay-3" onClick={showCalculator}>
         {t('nutrition.calculator')}
       </button>
+
+      {/* Камера открывается сразу с кнопки — клик по input идёт из жеста пользователя. */}
+      <input
+        ref={photoInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        hidden
+        onChange={handlePhotoPicked}
+      />
+
+      <FoodFab
+        onPhoto={() => photoInputRef.current?.click()}
+        onVoice={() => setFoodModal('voice')}
+        onBarcode={() => setFoodModal('barcode')}
+        onSearch={() => setFoodModal('search')}
+      />
+
+      {foodModal === 'photo' && photoFile && (
+        <PhotoFoodModal
+          file={photoFile}
+          onRetake={() => photoInputRef.current?.click()}
+          onAdded={setDay}
+          onClose={() => { setFoodModal(null); setPhotoFile(null) }}
+        />
+      )}
+      {foodModal === 'voice' && (
+        <VoiceFoodModal onAdded={setDay} onClose={() => setFoodModal(null)} />
+      )}
+      {foodModal === 'barcode' && (
+        <BarcodeFoodModal onAdded={setDay} onClose={() => setFoodModal(null)} />
+      )}
+      {foodModal === 'search' && (
+        <SearchFoodModal onAdded={setDay} onClose={() => setFoodModal(null)} />
+      )}
     </section>
   )
 }

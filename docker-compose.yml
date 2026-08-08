@@ -30,6 +30,14 @@ services:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_DEV_MODE: "False"
       TELEGRAM_LOGIN_CLIENT_ID: ${TELEGRAM_LOGIN_CLIENT_ID:-}
+      # ИИ-распознавание еды: провайдер google (Gemini, фото+голос одним ключом)
+      # или anthropic (Claude + Whisper для голоса).
+      NUTRITION_AI_PROVIDER: ${NUTRITION_AI_PROVIDER:-google}
+      NUTRITION_AI_MODEL: ${NUTRITION_AI_MODEL:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      STT_MODEL: ${STT_MODEL:-whisper-1}
       YOOKASSA_SHOP_ID: ${YOOKASSA_SHOP_ID:-}
       YOOKASSA_SECRET_KEY: ${YOOKASSA_SECRET_KEY:-}
       KINESCOPE_API_TOKEN: ${KINESCOPE_API_TOKEN:-}

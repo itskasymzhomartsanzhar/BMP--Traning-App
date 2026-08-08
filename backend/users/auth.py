@@ -123,6 +123,7 @@ class TelegramLoginOidcAuth:
     DEFAULT_JWKS_URL = 'https://oauth.telegram.org/.well-known/jwks.json'
     ALLOWED_ALGORITHMS = ['RS256', 'ES256', 'EdDSA', 'ES256K']
     JWKS_CACHE_KEY = 'telegram_login:jwks'
+    JWKS_STALE_KEY = 'telegram_login:jwks:stale'
 
     def __init__(self, client_ids, jwks_url=None, jwks_cache_seconds=3600):
         self._client_ids = [str(cid).strip() for cid in client_ids if str(cid or '').strip()]
@@ -208,13 +209,56 @@ class TelegramLoginOidcAuth:
                 return cached
 
         try:
-            response = requests.get(self._jwks_url, timeout=(5, 15))
-            response.raise_for_status()
-            jwks = response.json()
-        except Exception as exc:
-            raise AuthError(status=503, detail=f'telegram jwks is unavailable: {exc}')
+            jwks = self._request_jwks()
+        except AuthError:
+            # Сеть до Telegram легла — живём на последних успешно
+            # полученных ключах (они меняются редко).
+            stale = cache.get(self.JWKS_STALE_KEY)
+            if isinstance(stale, dict) and stale.get('keys'):
+                return stale
+            raise
 
         if not isinstance(jwks, dict) or not jwks.get('keys'):
             raise AuthError(status=503, detail='telegram jwks is empty')
         cache.set(self.JWKS_CACHE_KEY, jwks, self._jwks_cache_seconds)
+        cache.set(self.JWKS_STALE_KEY, jwks, None)
         return jwks
+
+    def _request_jwks(self) -> dict:
+        try:
+            response = requests.get(self._jwks_url, timeout=(5, 15))
+            response.raise_for_status()
+            return response.json()
+        except Exception as exc:
+            first_error = exc
+
+        # «Network is unreachable» часто значит: DNS отдал IPv6-адрес,
+        # а маршрута IPv6 у контейнера нет. Повторяем строго по IPv4.
+        try:
+            return self._request_jwks_ipv4()
+        except Exception as exc:
+            raise AuthError(
+                status=503,
+                detail=f'telegram jwks is unavailable: {first_error}; ipv4 retry: {exc}',
+            )
+
+    def _request_jwks_ipv4(self) -> dict:
+        parsed = urlparse(self._jwks_url)
+        host = parsed.hostname
+        port = parsed.port or 443
+        path = parsed.path or '/'
+        address = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)[0][4][0]
+        import certifi
+        pool = urllib3.HTTPSConnectionPool(
+            address,
+            port,
+            server_hostname=host,
+            assert_hostname=host,
+            ca_certs=certifi.where(),
+            timeout=urllib3.Timeout(connect=5, read=15),
+            retries=False,
+        )
+        response = pool.request('GET', path, headers={'Host': host})
+        if response.status != 200:
+            raise RuntimeError(f'jwks http {response.status}')
+        return json.loads(response.data)

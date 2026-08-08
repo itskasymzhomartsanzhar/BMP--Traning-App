@@ -215,7 +215,7 @@ class MeasurementsView(APIView):
             recorded_at=recorded_at,
         )
 
-        fields = ['weight', 'body_fat_percent', 'muscle_mass', 'neck_cm', 'chest_cm', 'waist_cm', 'hip_cm']
+        fields = ['weight', 'body_fat_percent', 'muscle_mass', 'neck_cm', 'chest_cm', 'arm_cm', 'waist_cm', 'hip_cm']
         changed = []
         for field in fields:
             if field in request.data:
@@ -245,6 +245,8 @@ def _measurement_to_dict(m):
         result.append({'label': 'Шея', 'value': f'{m.neck_cm} см', 'field': 'neck_cm'})
     if m.chest_cm is not None:
         result.append({'label': 'Грудь', 'value': f'{m.chest_cm} см', 'field': 'chest_cm'})
+    if m.arm_cm is not None:
+        result.append({'label': 'Рука', 'value': f'{m.arm_cm} см', 'field': 'arm_cm'})
     if m.waist_cm is not None:
         result.append({'label': 'Талия', 'value': f'{m.waist_cm} см', 'field': 'waist_cm'})
     if m.hip_cm is not None:

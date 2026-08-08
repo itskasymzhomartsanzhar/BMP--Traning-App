@@ -96,6 +96,10 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     ),
+    # ИИ-распознавание еды платное — ограничиваем частоту на пользователя.
+    'DEFAULT_THROTTLE_RATES': {
+        'nutrition-ai': '60/hour',
+    },
 }
 
 SIMPLE_JWT = {

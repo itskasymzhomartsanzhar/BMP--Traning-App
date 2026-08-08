@@ -290,6 +290,15 @@ def _apply_onboarding(user, data):
     user.onboarded_at = timezone.now()
     user.save()
 
+    # Вес из анкеты сразу становится первым замером в «Аналитике» —
+    # чтобы человеку не пришлось вносить его второй раз.
+    from analytics.models import WeightEntry
+    WeightEntry.objects.update_or_create(
+        user=user,
+        recorded_at=timezone.localdate(),
+        defaults={'value': user.weight},
+    )
+
     return {
         'program_id': program_id,
         'reason': reason,

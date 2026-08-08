@@ -25,6 +25,7 @@ class BodyMeasurement(models.Model):
     muscle_mass = models.FloatField('Мышечная масса, кг', null=True, blank=True)
     neck_cm = models.IntegerField('Шея, см', null=True, blank=True)
     chest_cm = models.IntegerField('Грудь, см', null=True, blank=True)
+    arm_cm = models.IntegerField('Рука, см', null=True, blank=True)
     waist_cm = models.IntegerField('Талия, см', null=True, blank=True)
     hip_cm = models.IntegerField('Бёдра, см', null=True, blank=True)
 

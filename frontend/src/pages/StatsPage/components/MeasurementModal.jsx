@@ -4,10 +4,11 @@ import { addMeasurement } from '../../../api/analytics'
 import { useAppUI } from '../../../context/AppUIContext'
 import './MeasurementModal.scss'
 
-// Обхваты сверху вниз по телу: шея, грудь, талия, бёдра.
+// Обхваты сверху вниз по телу: шея, грудь, рука, талия, бёдра.
 const FIELDS = [
   { field: 'neck_cm', labelKey: 'stats.neck', placeholder: '38' },
   { field: 'chest_cm', labelKey: 'stats.chest', placeholder: '100' },
+  { field: 'arm_cm', labelKey: 'stats.arm', placeholder: '35' },
   { field: 'waist_cm', labelKey: 'stats.waist', placeholder: '82' },
   { field: 'hip_cm', labelKey: 'stats.hips', placeholder: '96' },
 ]

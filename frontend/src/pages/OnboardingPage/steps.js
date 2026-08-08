@@ -28,9 +28,6 @@ export const INJURY_OPTIONS = [
   { id: 'none', labelKey: 'onb.injNone' },
   { id: 'knee', labelKey: 'onb.injKnee' },
   { id: 'back', labelKey: 'onb.injBack' },
-  { id: 'shoulder', labelKey: 'onb.injShoulder' },
-  { id: 'wrist', labelKey: 'onb.injWrist' },
-  { id: 'ankle', labelKey: 'onb.injAnkle' },
 ]
 
 // Подписи дней берутся из 'calendar.weekdays' по индексу.

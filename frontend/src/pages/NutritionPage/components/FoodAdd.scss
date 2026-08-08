@@ -1,0 +1,736 @@
+/* Добавление еды: FAB, модалки распознавания, дневник. */
+
+/* --- Плавающая кнопка --- */
+
+.food-fab-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(5, 5, 4, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.food-fab {
+  position: fixed;
+  right: 16px;
+  bottom: calc(84px + env(safe-area-inset-bottom));
+  z-index: 41;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.food-fab__main {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  border: none;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #221c12;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px rgba(212, 175, 106, 0.35);
+  transition: transform 0.2s ease;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.2s ease;
+  }
+}
+
+.food-fab--open .food-fab__main svg {
+  transform: rotate(45deg);
+}
+
+.food-fab__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.food-fab__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  animation: food-fab-in 0.18s ease both;
+}
+
+.food-fab__action-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+.food-fab__action-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--line);
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 17px;
+    height: 17px;
+  }
+}
+
+@keyframes food-fab-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Общее в модалках --- */
+
+.food-modal {
+  width: min(100%, 420px);
+  max-height: min(86vh, 720px);
+  overflow-y: auto;
+}
+
+.food-modal__photo {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  margin-bottom: 12px;
+}
+
+.food-modal__status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 18px 0;
+}
+
+.food-modal__spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  border-top-color: var(--accent);
+  animation: food-spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes food-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.food-modal__note {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.food-modal__error {
+  font-size: 13px;
+  color: #e2a68a;
+  margin-bottom: 12px;
+}
+
+.food-modal__quote {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 12px;
+}
+
+.food-modal__or {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 14px 0 8px;
+}
+
+.food-modal__textarea {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--bg-soft);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  font-size: 14px;
+  padding: 10px 12px;
+  resize: none;
+  margin-bottom: 12px;
+
+  &:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+}
+
+.food-modal__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  padding: 0;
+  margin-bottom: 12px;
+
+  svg {
+    width: 11px;
+    height: 11px;
+  }
+}
+
+/* --- Превью распознанных позиций --- */
+
+.food-preview__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.food-preview__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.food-preview__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  strong {
+    font-size: 14px;
+  }
+
+  span {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+}
+
+.food-preview__grams {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+
+  input {
+    width: 62px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--bg-surface);
+    color: var(--text-main);
+    font-size: 14px;
+    text-align: right;
+    padding: 6px 8px;
+
+    &:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+  }
+
+  span {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+}
+
+.food-preview__remove {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 13px;
+    height: 13px;
+  }
+}
+
+.food-preview__total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+  margin-bottom: 4px;
+
+  span {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+
+  strong {
+    font-size: 13px;
+  }
+}
+
+/* --- Голос --- */
+
+.food-voice__record {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 14px;
+  border: 1px dashed var(--accent-dark);
+  background: rgba(232, 201, 143, 0.08);
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 16px;
+
+  svg {
+    width: 17px;
+    height: 17px;
+  }
+}
+
+.food-voice__live {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 0 18px;
+
+  strong {
+    font-size: 24px;
+    font-family: var(--font-display);
+  }
+}
+
+.food-voice__pulse {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(232, 201, 143, 0.14);
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: food-pulse 1.4s ease-in-out infinite;
+
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.food-voice__hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+@keyframes food-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(232, 201, 143, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(232, 201, 143, 0);
+  }
+}
+
+/* --- Штрих-код --- */
+
+.food-scan {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  margin-bottom: 4px;
+}
+
+.food-scan__video {
+  display: block;
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  background: var(--bg-deep);
+}
+
+.food-scan__frame {
+  position: absolute;
+  inset: 24px 32px;
+  border: 2px solid rgba(232, 201, 143, 0.75);
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.food-scan__hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+  text-align: center;
+  font-size: 12px;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+.food-scan__manual {
+  display: flex;
+  gap: 8px;
+
+  input {
+    flex: 1;
+    min-width: 0;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--bg-soft);
+    color: var(--text-main);
+    font-size: 14px;
+    padding: 10px 12px;
+
+    &:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+  }
+
+  .primary {
+    width: auto;
+    padding: 10px 16px;
+    flex-shrink: 0;
+  }
+}
+
+/* --- Карточка продукта (штрих-код и поиск) --- */
+
+.food-product {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.food-product__icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: rgba(232, 201, 143, 0.12);
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.food-product__info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+
+  strong {
+    font-size: 14px;
+  }
+
+  span {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+}
+
+.food-portion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+
+  span {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  input {
+    width: 96px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--bg-soft);
+    color: var(--text-main);
+    font-size: 15px;
+    text-align: right;
+    padding: 9px 12px;
+
+    &:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+  }
+}
+
+/* --- Поиск --- */
+
+.food-search__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0 4px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.food-search__item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: left;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--text-main);
+  padding: 10px 12px;
+}
+
+.food-search__name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+
+  strong {
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  span {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+}
+
+.food-search__kcal {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: 13px;
+  flex-shrink: 0;
+
+  em {
+    font-style: normal;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+}
+
+.food-search__manual-link {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  padding: 12px 0 2px;
+}
+
+/* --- Ручное добавление --- */
+
+.food-manual {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    span {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    input {
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--bg-soft);
+      color: var(--text-main);
+      font-size: 14px;
+      padding: 9px 12px;
+
+      &:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+    }
+  }
+}
+
+.food-manual__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* --- Дневник на странице питания --- */
+
+.food-diary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.food-diary__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+.food-diary__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  strong {
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  span {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+}
+
+.food-diary__kcal {
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.food-diary__remove {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 13px;
+    height: 13px;
+  }
+}
+
+.food-diary__empty {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 16px 12px;
+}
+
+/* --- Прогресс «съедено / цель» в шапке --- */
+
+/* Карточка калорий светлая — прогресс тёмный, при переборе — терракотовый. */
+.nutrition-hero__progress {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(21, 21, 21, 0.15);
+  overflow: hidden;
+  margin-top: 4px;
+
+  i {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: #151515;
+    transition: width 0.3s ease;
+  }
+
+  &--over i {
+    background: #b4552d;
+  }
+}
+
+.macro-pill__bar {
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  margin-top: 6px;
+
+  i {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--accent);
+    transition: width 0.3s ease;
+  }
+}
