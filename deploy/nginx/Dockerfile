@@ -1,5 +1,5 @@
-# Стадия 1: сборка фронтенда
-FROM node:22-alpine AS frontend-build
+# Стадия 1: сборка фронтенда (node ≥ 24 — требование @zxing/library)
+FROM node:24-alpine AS frontend-build
 
 WORKDIR /build
 
