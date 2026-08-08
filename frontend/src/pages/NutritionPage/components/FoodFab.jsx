@@ -36,7 +36,7 @@ function FoodFab({ onPhoto, onVoice, onBarcode, onSearch }) {
             ))}
           </div>
         )}
-        <button
+        {/*<button
           type="button"
           className="food-fab__main"
           aria-label={t('food.addTitle')}
@@ -44,7 +44,7 @@ function FoodFab({ onPhoto, onVoice, onBarcode, onSearch }) {
           onClick={() => setOpen((prev) => !prev)}
         >
           <FaPlus aria-hidden="true" />
-        </button>
+        </button>*/}
       </div>
     </>
   )
